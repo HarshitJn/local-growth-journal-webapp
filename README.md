@@ -67,6 +67,19 @@ Setting up your intelligence engine is simple and happens entirely in the floati
 
 ---
 
+## 🔒 Privacy & Security (FAQ)
+
+**Q: Can the creator or other third parties read my journal entries?**
+> **No.** The application is 100% local, serverless, and open-source. The code runs entirely on your own laptop as a local web application. There are no backend databases, tracking scripts, or host-side logs. Your private logs never go to any "website provider" or third-party server.
+
+**Q: Where is my API key stored? Is it safe?**
+> **Yes.** You input your LLM API key directly into the application window. The key is stored inside your browser's secure `localStorage` sandbox on your local machine. It never leaves your device, is never uploaded online, and is completely invisible to anyone else.
+
+**Q: How does the AI analysis work then?**
+> When you write an entry, the application uses your saved API key to make a direct HTTPS request from your browser to the chosen LLM provider's official server (Google, OpenAI, or Anthropic). Your journal data travels securely to the model endpoints for processing, exactly as it does when you use the official ChatGPT, Gemini, or Claude web interfaces.
+
+---
+
 ## 💾 Local Storage Schema
 
 All configuration and data is stored locally under:
