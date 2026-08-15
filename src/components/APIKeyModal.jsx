@@ -34,7 +34,8 @@ export default function APIKeyModal() {
     const savedModel = getModelName(prov);
     const standardModels = [
       'gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-pro',
-      'gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo',
+      'gpt-4o-mini', 'gpt-4o', 'o3-mini', 'o1-mini', 'gpt-4-turbo',
+      'claude-3-5-haiku-latest', 'claude-3-5-sonnet-latest', 'claude-3-opus-latest',
       'claude-3-5-haiku', 'claude-3-5-sonnet', 'claude-3-opus'
     ];
 
@@ -97,14 +98,15 @@ export default function APIKeyModal() {
       case 'openai':
         return [
           { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Fast)' },
-          { value: 'gpt-4o', label: 'GPT-4o (Reasoning)' },
-          { value: 'gpt-4-turbo', label: 'GPT-4 Turbo (Legacy)' }
+          { value: 'gpt-4o', label: 'GPT-4o (Standard)' },
+          { value: 'o3-mini', label: 'OpenAI o3-mini (Latest Reasoning)' },
+          { value: 'o1-mini', label: 'OpenAI o1-mini (Reasoning)' }
         ];
       case 'anthropic':
         return [
-          { value: 'claude-3-5-haiku', label: 'Claude 3.5 Haiku (Fast)' },
-          { value: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet (Balanced)' },
-          { value: 'claude-3-opus', label: 'Claude 3 Opus (High Intellect)' }
+          { value: 'claude-3-5-haiku-latest', label: 'Claude 3.5 Haiku (Latest)' },
+          { value: 'claude-3-5-sonnet-latest', label: 'Claude 3.5 Sonnet v2 (Latest)' },
+          { value: 'claude-3-opus-latest', label: 'Claude 3 Opus (Latest)' }
         ];
       case 'gemini':
       default:

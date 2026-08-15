@@ -207,12 +207,17 @@ const PRICING = {
   openai: {
     'gpt-4o-mini': { input: 0.15 / 1000000, output: 0.60 / 1000000 },
     'gpt-4o': { input: 2.50 / 1000000, output: 10.00 / 1000000 },
+    'o3-mini': { input: 1.10 / 1000000, output: 4.40 / 1000000 },
+    'o1-mini': { input: 1.10 / 1000000, output: 4.40 / 1000000 },
     'gpt-4-turbo': { input: 10.00 / 1000000, output: 30.00 / 1000000 },
     default: { input: 0.15 / 1000000, output: 0.60 / 1000000 }
   },
   anthropic: {
+    'claude-3-5-haiku-latest': { input: 0.80 / 1000000, output: 4.00 / 1000000 },
     'claude-3-5-haiku': { input: 0.80 / 1000000, output: 4.00 / 1000000 },
+    'claude-3-5-sonnet-latest': { input: 3.00 / 1000000, output: 15.00 / 1000000 },
     'claude-3-5-sonnet': { input: 3.00 / 1000000, output: 15.00 / 1000000 },
+    'claude-3-opus-latest': { input: 15.00 / 1000000, output: 75.00 / 1000000 },
     'claude-3-opus': { input: 15.00 / 1000000, output: 75.00 / 1000000 },
     default: { input: 0.80 / 1000000, output: 4.00 / 1000000 }
   }

@@ -68,7 +68,7 @@ export const getModelName = (provider = getProvider()) => {
     case 'openai':
       return 'gpt-4o-mini';
     case 'anthropic':
-      return 'claude-3-5-haiku';
+      return 'claude-3-5-haiku-latest';
     case 'gemini':
     default:
       return 'gemini-3.5-flash';
