@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw, CheckCircle, Info, Sparkles } from 'lucide-react';
+import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw, CheckCircle, Info, Sparkles, Target, ListTodo } from 'lucide-react';
 import './App.css';
 
 // Component imports
 import Widget from './components/Widget';
+import KeepWidget from './components/KeepWidget';
 import JournalHistory from './components/JournalHistory';
 import JournalInput from './components/JournalInput';
 import APIKeyModal from './components/APIKeyModal';
@@ -25,6 +26,8 @@ function App() {
     strengths: [],
     quotes: [],
   });
+  const [goals, setGoals] = useState([]);
+  const [todos, setTodos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [widgetLoading, setWidgetLoading] = useState({
     problems: false,
@@ -67,6 +70,8 @@ function App() {
       strengths: [],
       quotes: [],
     });
+    setGoals(data.goals || []);
+    setTodos(data.todos || []);
   }, []);
 
   const handleSendLog = async (text) => {
@@ -81,7 +86,7 @@ function App() {
     };
     const updatedLogs = [...logs, newLog];
     setLogs(updatedLogs);
-    saveJournalData({ logs: updatedLogs, widgets });
+    saveJournalData({ logs: updatedLogs, widgets, goals, todos });
     setErrorMsg('');
 
     // Check if the entry is trivial (less than 3 words or standard greeting noise)
@@ -104,14 +109,14 @@ function App() {
     // 3. Call LLM to update insights
     setIsLoading(true);
     try {
-      const { insights, usage } = await analyzeJournal(updatedLogs, provider, apiKey, modelName);
+      const { insights, usage } = await analyzeJournal(updatedLogs, provider, apiKey, modelName, goals, todos);
       
       // Determine if there is any difference between the old and new insights
       const hasChanged = JSON.stringify(insights) !== JSON.stringify(widgets);
       
       // Update widgets state and persist
       setWidgets(insights);
-      saveJournalData({ logs: updatedLogs, widgets: insights });
+      saveJournalData({ logs: updatedLogs, widgets: insights, goals, todos });
 
       // Record token usage and cost
       let totalTokens = 0;
@@ -148,19 +153,19 @@ function App() {
     if (updatedLogs.length === 0) {
       const emptyWidgets = { problems: [], learnings: [], strengths: [], quotes: [] };
       setWidgets(emptyWidgets);
-      saveJournalData({ logs: [], widgets: emptyWidgets });
+      saveJournalData({ logs: [], widgets: emptyWidgets, goals, todos });
       return;
     }
 
-    saveJournalData({ logs: updatedLogs, widgets });
+    saveJournalData({ logs: updatedLogs, widgets, goals, todos });
 
     // Re-analyze remaining logs to keep insights synchronized, if key is available
     if (apiKey) {
       setIsLoading(true);
       try {
-        const { insights, usage } = await analyzeJournal(updatedLogs, provider, apiKey, modelName);
+        const { insights, usage } = await analyzeJournal(updatedLogs, provider, apiKey, modelName, goals, todos);
         setWidgets(insights);
-        saveJournalData({ logs: updatedLogs, widgets: insights });
+        saveJournalData({ logs: updatedLogs, widgets: insights, goals, todos });
 
         // Record token usage and cost
         if (usage && (usage.inputTokens > 0 || usage.outputTokens > 0)) {
@@ -189,23 +194,27 @@ function App() {
       strengths: [],
       quotes: [],
     });
+    setGoals(importedData.goals || []);
+    setTodos(importedData.todos || []);
   };
 
   const handleClearAllData = () => {
-    if (logs.length === 0) {
+    if (logs.length === 0 && goals.length === 0 && todos.length === 0) {
       alert("Your journal is already empty.");
       return;
     }
     const confirmation = window.prompt(
-      "This will permanently erase ALL journal entries and AI insights.\n" +
+      "This will permanently erase ALL journal entries, goals, todos, and AI insights.\n" +
       "To confirm this destructive action, please type 'erase' below:"
     );
     if (confirmation === 'erase') {
       const emptyWidgets = { problems: [], learnings: [], strengths: [], quotes: [] };
       setLogs([]);
       setWidgets(emptyWidgets);
-      saveJournalData({ logs: [], widgets: emptyWidgets });
-      alert("All journal data and insights have been erased.");
+      setGoals([]);
+      setTodos([]);
+      saveJournalData({ logs: [], widgets: emptyWidgets, goals: [], todos: [] });
+      alert("All journal data, goals, todos, and insights have been erased.");
     } else if (confirmation !== null) {
       alert("Wipe cancelled. Confirmation text did not match.");
     }
@@ -221,7 +230,7 @@ function App() {
     if (window.confirm(`Erase all content in the ${sectionNames[key]} widget?`)) {
       const updatedWidgets = { ...widgets, [key]: [] };
       setWidgets(updatedWidgets);
-      saveJournalData({ logs, widgets: updatedWidgets });
+      saveJournalData({ logs, widgets: updatedWidgets, goals, todos });
     }
   };
 
@@ -238,11 +247,11 @@ function App() {
     setWidgetLoading((prev) => ({ ...prev, [key]: true }));
     setErrorMsg('');
     try {
-      const { items, usage } = await analyzeSingleWidget(logs, key, provider, apiKey, modelName);
+      const { items, usage } = await analyzeSingleWidget(logs, key, provider, apiKey, modelName, goals, todos);
       
       const updatedWidgets = { ...widgets, [key]: items };
       setWidgets(updatedWidgets);
-      saveJournalData({ logs, widgets: updatedWidgets });
+      saveJournalData({ logs, widgets: updatedWidgets, goals, todos });
 
       if (usage && (usage.inputTokens > 0 || usage.outputTokens > 0)) {
         const cost = calculateCost(provider, modelName, usage.inputTokens, usage.outputTokens);
@@ -275,9 +284,9 @@ function App() {
     setIsLoading(true);
     setErrorMsg('');
     try {
-      const { insights, usage } = await analyzeJournal(logs, provider, apiKey, modelName);
+      const { insights, usage } = await analyzeJournal(logs, provider, apiKey, modelName, goals, todos);
       setWidgets(insights);
-      saveJournalData({ logs, widgets: insights });
+      saveJournalData({ logs, widgets: insights, goals, todos });
 
       if (usage && (usage.inputTokens > 0 || usage.outputTokens > 0)) {
         const cost = calculateCost(provider, modelName, usage.inputTokens, usage.outputTokens);
@@ -298,10 +307,72 @@ function App() {
     }
   };
 
+  // Goals Handlers
+  const handleAddGoal = (text) => {
+    const newGoal = { id: Date.now().toString(), text, completed: false };
+    const updated = [...goals, newGoal];
+    setGoals(updated);
+    saveJournalData({ logs, widgets, goals: updated, todos });
+  };
+
+  const handleToggleGoal = (id) => {
+    const updated = goals.map(g => g.id === id ? { ...g, completed: !g.completed } : g);
+    setGoals(updated);
+    saveJournalData({ logs, widgets, goals: updated, todos });
+  };
+
+  const handleDeleteGoal = (id) => {
+    const updated = goals.filter(g => g.id !== id);
+    setGoals(updated);
+    saveJournalData({ logs, widgets, goals: updated, todos });
+  };
+
+  const handleEditGoal = (id, newText) => {
+    const updated = goals.map(g => g.id === id ? { ...g, text: newText } : g);
+    setGoals(updated);
+    saveJournalData({ logs, widgets, goals: updated, todos });
+  };
+
+  // Todos Handlers
+  const handleAddTodo = (text) => {
+    const newTodo = { id: Date.now().toString(), text, completed: false };
+    const updated = [...todos, newTodo];
+    setTodos(updated);
+    saveJournalData({ logs, widgets, goals, todos: updated });
+  };
+
+  const handleToggleTodo = (id) => {
+    const updated = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+    setTodos(updated);
+    saveJournalData({ logs, widgets, goals, todos: updated });
+  };
+
+  const handleDeleteTodo = (id) => {
+    const updated = todos.filter(t => t.id !== id);
+    setTodos(updated);
+    saveJournalData({ logs, widgets, goals, todos: updated });
+  };
+
+  const handleEditTodo = (id, newText) => {
+    const updated = todos.map(t => t.id === id ? { ...t, text: newText } : t);
+    setTodos(updated);
+    saveJournalData({ logs, widgets, goals, todos: updated });
+  };
+
   return (
     <div className="app-container">
-      {/* Column 1: Left Widgets */}
+      {/* Column 1: Left Sidebar (Goals & AI Insights) */}
       <aside className="left-sidebar">
+        <KeepWidget
+          title="Goals"
+          icon={<Target size={18} />}
+          items={goals}
+          onAddItem={handleAddGoal}
+          onToggleItem={handleToggleGoal}
+          onDeleteItem={handleDeleteGoal}
+          onEditItem={handleEditGoal}
+          placeholder="Add a goal..."
+        />
         <Widget
           title="Current Problems"
           icon={<AlertCircle size={18} />}
@@ -354,8 +425,18 @@ function App() {
         <JournalInput onSend={handleSendLog} isLoading={isLoading} provider={provider} />
       </main>
 
-      {/* Column 3: Right Widgets */}
+      {/* Column 3: Right Sidebar (Todos & AI Insights) */}
       <aside className="right-sidebar">
+        <KeepWidget
+          title="Todos"
+          icon={<ListTodo size={18} />}
+          items={todos}
+          onAddItem={handleAddTodo}
+          onToggleItem={handleToggleTodo}
+          onDeleteItem={handleDeleteTodo}
+          onEditItem={handleEditTodo}
+          placeholder="Add a todo..."
+        />
         <Widget
           title="Identified Strengths"
           icon={<Shield size={18} />}

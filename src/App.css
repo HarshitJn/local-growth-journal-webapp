@@ -49,6 +49,22 @@
   height: calc(100vh - 48px);
   position: sticky;
   top: 24px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Hide scrollbar for sidebars but allow scrolling */
+.left-sidebar::-webkit-scrollbar, .right-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.left-sidebar::-webkit-scrollbar-thumb, .right-sidebar::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 4px;
+}
+
+.left-sidebar::-webkit-scrollbar-thumb:hover, .right-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 @media (max-width: 1100px) {
@@ -666,4 +682,28 @@
   opacity: 0.4;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Google Keep-Style Cards */
+.keep-card {
+  border-color: rgba(220, 168, 66, 0.15) !important;
+  background: rgba(220, 168, 66, 0.01) !important;
+}
+
+.keep-card:hover {
+  border-color: rgba(220, 168, 66, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(220, 168, 66, 0.05);
+}
+
+.keep-card .widget-title {
+  color: #e5b358 !important;
+}
+
+.keep-item {
+  border: 1px solid var(--card-border) !important;
+}
+
+.keep-item:hover {
+  background-color: rgba(220, 168, 66, 0.04) !important;
+  border-color: rgba(220, 168, 66, 0.25) !important;
 }

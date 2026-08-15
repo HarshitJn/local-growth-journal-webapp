@@ -10,7 +10,7 @@ import { cleanAndParseJson } from './jsonParser';
  * @param {string} modelName - The model to use
  * @returns {Promise<Object>} Object with problems, learnings, strengths, quotes
  */
-export async function analyzeJournal(logs, provider, apiKey, modelName) {
+export async function analyzeJournal(logs, provider, apiKey, modelName, goals = [], todos = []) {
   if (!apiKey) {
     throw new Error(`Please configure your API Key for ${provider.toUpperCase()} in settings.`);
   }
@@ -24,8 +24,11 @@ export async function analyzeJournal(logs, provider, apiKey, modelName) {
     `[Log #${index + 1} - ${new Date(log.timestamp).toLocaleDateString()}]\n${log.text}`
   ).join('\n\n');
 
+  const activeGoalsStr = goals.filter(g => !g.completed).map(g => `- ${g.text}`).join('\n');
+  const activeTodosStr = todos.filter(t => !t.completed).map(t => `- ${t.text}`).join('\n');
+
   const systemInstruction = `You are a peaceful, empathetic AI journal companion designed to help the user reflect. 
-Analyze the user's journal logs (ordered from oldest to newest) and extract/update insights.
+Analyze the user's journal logs, active goals, and active todos (ordered from oldest to newest) and extract/update insights.
 
 Crucial Rule: Write all bullet points for "problems", "learnings", and "strengths" in the FIRST PERSON (using "I", "my", "me", "myself") from the perspective of the user writing personal notes to themselves. 
 For example:
@@ -51,7 +54,13 @@ Return ONLY the raw JSON object. Do not add markdown codeblocks, prefix conversa
   const prompt = `User Journal Logs:
 ${logContent}
 
-Based on these logs, extract problems, learnings, strengths, and quotes in the requested JSON format.`;
+Active User Goals:
+${activeGoalsStr || "None set."}
+
+Active User Todos:
+${activeTodosStr || "None set."}
+
+Based on these journal logs and my current active goals/todos, extract problems, learnings, strengths, and quotes in the requested JSON format. Analyze how my logs relate to, reflect progress on, or show blockers concerning these active goals/todos.`;
 
   switch (provider) {
     case 'openai':
@@ -228,7 +237,7 @@ export function calculateCost(provider, model, inputTokens, outputTokens) {
   return (inputTokens * rates.input) + (outputTokens * rates.output);
 }
 
-export async function analyzeSingleWidget(logs, widgetKey, provider, apiKey, modelName) {
+export async function analyzeSingleWidget(logs, widgetKey, provider, apiKey, modelName, goals = [], todos = []) {
   if (!apiKey) {
     throw new Error(`Please configure your API Key for ${provider.toUpperCase()} in settings.`);
   }
@@ -242,6 +251,9 @@ export async function analyzeSingleWidget(logs, widgetKey, provider, apiKey, mod
     `[Log #${index + 1} - ${new Date(log.timestamp).toLocaleDateString()}]\n${log.text}`
   ).join('\n\n');
 
+  const activeGoalsStr = goals.filter(g => !g.completed).map(g => `- ${g.text}`).join('\n');
+  const activeTodosStr = todos.filter(t => !t.completed).map(t => `- ${t.text}`).join('\n');
+
   const descriptions = {
     problems: 'Current problems, friction points, or blockers I am currently facing (exactly 5 to 12 words per item, maximum of 5 items). Write in the FIRST PERSON (using "I", "my", "me").',
     learnings: 'Key learnings, realizations, or takeaways I have discovered (exactly 5 to 12 words per item, maximum of 5 items). Write in the FIRST PERSON (using "I", "my", "me").',
@@ -250,7 +262,7 @@ export async function analyzeSingleWidget(logs, widgetKey, provider, apiKey, mod
   };
 
   const systemInstruction = `You are a peaceful, empathetic AI journal companion designed to help the user reflect. 
-Analyze the user's journal logs (ordered from oldest to newest) and extract/update insights for the specific section: "${widgetKey}".
+Analyze the user's journal logs, active goals, and active todos (ordered from oldest to newest) and extract/update insights for the specific section: "${widgetKey}".
 
 Section description to extract:
 - "${widgetKey}": ${descriptions[widgetKey]}
@@ -264,7 +276,13 @@ Return ONLY the raw JSON object. Do not add markdown codeblocks, prefix conversa
   const prompt = `User Journal Logs:
 ${logContent}
 
-Based on these logs, extract only the list for "${widgetKey}" in the requested JSON format.`;
+Active User Goals:
+${activeGoalsStr || "None set."}
+
+Active User Todos:
+${activeTodosStr || "None set."}
+
+Based on these journal logs and my current active goals/todos, extract only the list for "${widgetKey}" in the requested JSON format. Analyze how my logs relate to, reflect progress on, or show blockers concerning these active goals/todos.`;
 
   let response;
   switch (provider) {

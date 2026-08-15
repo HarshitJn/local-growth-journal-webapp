@@ -91,30 +91,31 @@ export const clearAllKeys = () => {
 
 export const getJournalData = () => {
   const data = localStorage.getItem(KEYS.JOURNAL_DATA);
-  if (!data) {
-    return {
-      logs: [],
-      widgets: {
-        problems: [],
-        learnings: [],
-        strengths: [],
-        quotes: [],
-      },
-    };
-  }
+  const defaultVal = {
+    logs: [],
+    widgets: {
+      problems: [],
+      learnings: [],
+      strengths: [],
+      quotes: [],
+    },
+    goals: [],
+    todos: []
+  };
+
+  if (!data) return defaultVal;
+
   try {
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    return {
+      logs: parsed.logs || [],
+      widgets: parsed.widgets || defaultVal.widgets,
+      goals: parsed.goals || [],
+      todos: parsed.todos || []
+    };
   } catch (e) {
     console.error('Failed to parse journal data from localStorage:', e);
-    return {
-      logs: [],
-      widgets: {
-        problems: [],
-        learnings: [],
-        strengths: [],
-        quotes: [],
-      },
-    };
+    return defaultVal;
   }
 };
 
@@ -142,8 +143,14 @@ export const importData = (file) => {
       try {
         const parsed = JSON.parse(e.target.result);
         if (parsed && Array.isArray(parsed.logs) && parsed.widgets) {
-          saveJournalData(parsed);
-          resolve(parsed);
+          const normalized = {
+            logs: parsed.logs,
+            widgets: parsed.widgets,
+            goals: parsed.goals || [],
+            todos: parsed.todos || []
+          };
+          saveJournalData(normalized);
+          resolve(normalized);
         } else {
           reject(new Error('Invalid backup file structure.'));
         }
