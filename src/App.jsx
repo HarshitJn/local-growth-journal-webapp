@@ -415,8 +415,30 @@ function App() {
         <JournalInput onSend={handleSendLog} isLoading={isLoading} provider={provider} />
       </main>
 
-      {/* Column 3: Right Sidebar (Goals, Todos & AI Insights) */}
+      {/* Column 3: Right Sidebar (AI Insights) */}
       <aside className="right-sidebar">
+        <Widget
+          title="Identified Strengths"
+          icon={<Shield size={18} />}
+          items={widgets.strengths}
+          emptyText="Your strengths will shine here as you write about your days."
+          onErase={() => handleEraseSingleWidget('strengths')}
+          onRefresh={() => handleRefreshSingleWidget('strengths')}
+          isLoading={widgetLoading.strengths}
+        />
+        <Widget
+          title="Key Quotes"
+          icon={<Quote size={18} />}
+          items={widgets.quotes}
+          emptyText="Memorable one-liners to carry with you throughout the day."
+          onErase={() => handleEraseSingleWidget('quotes')}
+          onRefresh={() => handleRefreshSingleWidget('quotes')}
+          isLoading={widgetLoading.quotes}
+        />
+      </aside>
+
+      {/* Column 4: Rightmost Sidebar (Goals & Todos) */}
+      <aside className="rightmost-sidebar">
         <KeepWidget
           title="Goals"
           icon={<Target size={18} />}
@@ -436,24 +458,6 @@ function App() {
           onDeleteItem={handleDeleteTodo}
           onEditItem={handleEditTodo}
           placeholder="Add a todo..."
-        />
-        <Widget
-          title="Identified Strengths"
-          icon={<Shield size={18} />}
-          items={widgets.strengths}
-          emptyText="Your strengths will shine here as you write about your days."
-          onErase={() => handleEraseSingleWidget('strengths')}
-          onRefresh={() => handleRefreshSingleWidget('strengths')}
-          isLoading={widgetLoading.strengths}
-        />
-        <Widget
-          title="Key Quotes"
-          icon={<Quote size={18} />}
-          items={widgets.quotes}
-          emptyText="Memorable one-liners to carry with you throughout the day."
-          onErase={() => handleEraseSingleWidget('quotes')}
-          onRefresh={() => handleRefreshSingleWidget('quotes')}
-          isLoading={widgetLoading.quotes}
         />
       </aside>
 

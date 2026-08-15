@@ -2,24 +2,32 @@
 
 .app-container {
   display: grid;
-  grid-template-columns: 320px 1fr 320px;
+  grid-template-columns: 280px 1fr 280px 280px;
   min-height: 100vh;
   min-height: 100dvh;
   width: 100%;
-  max-width: 1600px;
+  max-width: 1800px;
   margin: 0 auto;
   padding: 24px;
   gap: 24px;
   position: relative;
 }
 
+@media (max-width: 1500px) {
+  .app-container {
+    grid-template-columns: 240px 1fr 240px 240px;
+    gap: 16px;
+    padding: 16px;
+  }
+}
+
 /* responsive grid layout */
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   .app-container {
     grid-template-columns: 280px 1fr;
     grid-template-rows: auto;
   }
-  .right-sidebar {
+  .right-sidebar, .rightmost-sidebar {
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -33,7 +41,7 @@
     padding: 16px;
     gap: 16px;
   }
-  .left-sidebar, .right-sidebar {
+  .left-sidebar, .right-sidebar, .rightmost-sidebar {
     grid-column: auto;
     display: flex;
     flex-direction: column;
@@ -42,7 +50,7 @@
 }
 
 /* Sidebar structure */
-.left-sidebar, .right-sidebar {
+.left-sidebar, .right-sidebar, .rightmost-sidebar {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -54,26 +62,21 @@
 }
 
 /* Hide scrollbar for sidebars but allow scrolling */
-.left-sidebar::-webkit-scrollbar, .right-sidebar::-webkit-scrollbar {
+.left-sidebar::-webkit-scrollbar, .right-sidebar::-webkit-scrollbar, .rightmost-sidebar::-webkit-scrollbar {
   width: 4px;
 }
 
-.left-sidebar::-webkit-scrollbar-thumb, .right-sidebar::-webkit-scrollbar-thumb {
+.left-sidebar::-webkit-scrollbar-thumb, .right-sidebar::-webkit-scrollbar-thumb, .rightmost-sidebar::-webkit-scrollbar-thumb {
   background: var(--card-border);
   border-radius: 4px;
 }
 
-.left-sidebar::-webkit-scrollbar-thumb:hover, .right-sidebar::-webkit-scrollbar-thumb:hover {
+.left-sidebar::-webkit-scrollbar-thumb:hover, .right-sidebar::-webkit-scrollbar-thumb:hover, .rightmost-sidebar::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
 }
 
-@media (max-width: 1100px) {
-  .left-sidebar {
-    height: auto;
-    position: relative;
-    top: 0;
-  }
-  .right-sidebar {
+@media (max-width: 1200px) {
+  .left-sidebar, .right-sidebar, .rightmost-sidebar {
     height: auto;
     position: relative;
     top: 0;
@@ -686,17 +689,17 @@
 
 /* Google Keep-Style Cards */
 .keep-card {
-  border-color: rgba(220, 168, 66, 0.15) !important;
-  background: rgba(220, 168, 66, 0.01) !important;
+  border-color: var(--card-border) !important;
+  background: var(--card-bg) !important;
 }
 
 .keep-card:hover {
-  border-color: rgba(220, 168, 66, 0.3) !important;
-  box-shadow: 0 8px 32px rgba(220, 168, 66, 0.05);
+  border-color: var(--card-border-hover) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
 .keep-card .widget-title {
-  color: #e5b358 !important;
+  color: var(--text-primary) !important;
 }
 
 .keep-item {
@@ -704,6 +707,6 @@
 }
 
 .keep-item:hover {
-  background-color: rgba(220, 168, 66, 0.04) !important;
-  border-color: rgba(220, 168, 66, 0.25) !important;
+  background-color: rgba(46, 73, 54, 0.1) !important;
+  border-color: var(--accent-border) !important;
 }
