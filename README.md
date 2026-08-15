@@ -26,9 +26,22 @@ It is completely client-side, local-first, and serverless. Your private keys and
 
 ---
 
-## 🚀 Local Installation
+## 🚀 One-Click Quick Launch (macOS)
 
-Ensure you have [Node.js](https://nodejs.org) installed on your system.
+If you are on a Mac, you can set up and start the application instantly with zero terminal configuration:
+
+1. Ensure you have [Node.js](https://nodejs.org) installed on your system.
+2. Double-click the **`start.command`** file in your project folder. 
+
+*What this script does:*
+- Opens the terminal window and points it to the app folder.
+- Installs all local dependencies (`npm install`) automatically on first run.
+- Starts the local web server.
+- Opens **Google Chrome** automatically to the application page.
+
+---
+
+## 🛠️ Manual Terminal Installation
 
 ### 1. Clone the repository
 ```bash
@@ -47,7 +60,7 @@ npm run dev
 ```
 
 ### 4. Open in Browser
-Visit the local server address (usually `http://localhost:5173`) in your browser.
+Visit `http://localhost:5173` in your browser.
 
 ---
 
