@@ -2,32 +2,24 @@
 
 .app-container {
   display: grid;
-  grid-template-columns: 280px 1fr 280px 280px;
+  grid-template-columns: 320px 1fr 320px;
   min-height: 100vh;
   min-height: 100dvh;
   width: 100%;
-  max-width: 1800px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 24px;
   gap: 24px;
   position: relative;
 }
 
-@media (max-width: 1500px) {
-  .app-container {
-    grid-template-columns: 240px 1fr 240px 240px;
-    gap: 16px;
-    padding: 16px;
-  }
-}
-
 /* responsive grid layout */
-@media (max-width: 1200px) {
+@media (max-width: 1100px) {
   .app-container {
     grid-template-columns: 280px 1fr;
     grid-template-rows: auto;
   }
-  .right-sidebar, .rightmost-sidebar {
+  .right-sidebar {
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -41,7 +33,7 @@
     padding: 16px;
     gap: 16px;
   }
-  .left-sidebar, .right-sidebar, .rightmost-sidebar {
+  .left-sidebar, .right-sidebar {
     grid-column: auto;
     display: flex;
     flex-direction: column;
@@ -50,7 +42,7 @@
 }
 
 /* Sidebar structure */
-.left-sidebar, .right-sidebar, .rightmost-sidebar {
+.left-sidebar, .right-sidebar {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -62,25 +54,40 @@
 }
 
 /* Hide scrollbar for sidebars but allow scrolling */
-.left-sidebar::-webkit-scrollbar, .right-sidebar::-webkit-scrollbar, .rightmost-sidebar::-webkit-scrollbar {
+.left-sidebar::-webkit-scrollbar, .right-sidebar::-webkit-scrollbar {
   width: 4px;
 }
 
-.left-sidebar::-webkit-scrollbar-thumb, .right-sidebar::-webkit-scrollbar-thumb, .rightmost-sidebar::-webkit-scrollbar-thumb {
+.left-sidebar::-webkit-scrollbar-thumb, .right-sidebar::-webkit-scrollbar-thumb {
   background: var(--card-border);
   border-radius: 4px;
 }
 
-.left-sidebar::-webkit-scrollbar-thumb:hover, .right-sidebar::-webkit-scrollbar-thumb:hover, .rightmost-sidebar::-webkit-scrollbar-thumb:hover {
+.left-sidebar::-webkit-scrollbar-thumb:hover, .right-sidebar::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
 }
 
-@media (max-width: 1200px) {
-  .left-sidebar, .right-sidebar, .rightmost-sidebar {
+@media (max-width: 1100px) {
+  .left-sidebar, .right-sidebar {
     height: auto;
     position: relative;
     top: 0;
   }
+}
+
+/* Sidebar Headings */
+.sidebar-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: -8px;
+  padding-left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.8;
 }
 
 /* Widget Card styles */
