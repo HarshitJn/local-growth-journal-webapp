@@ -361,18 +361,8 @@ function App() {
 
   return (
     <div className="app-container">
-      {/* Column 1: Left Sidebar (Goals & AI Insights) */}
+      {/* Column 1: Left Sidebar (AI Insights) */}
       <aside className="left-sidebar">
-        <KeepWidget
-          title="Goals"
-          icon={<Target size={18} />}
-          items={goals}
-          onAddItem={handleAddGoal}
-          onToggleItem={handleToggleGoal}
-          onDeleteItem={handleDeleteGoal}
-          onEditItem={handleEditGoal}
-          placeholder="Add a goal..."
-        />
         <Widget
           title="Current Problems"
           icon={<AlertCircle size={18} />}
@@ -425,8 +415,18 @@ function App() {
         <JournalInput onSend={handleSendLog} isLoading={isLoading} provider={provider} />
       </main>
 
-      {/* Column 3: Right Sidebar (Todos & AI Insights) */}
+      {/* Column 3: Right Sidebar (Goals, Todos & AI Insights) */}
       <aside className="right-sidebar">
+        <KeepWidget
+          title="Goals"
+          icon={<Target size={18} />}
+          items={goals}
+          onAddItem={handleAddGoal}
+          onToggleItem={handleToggleGoal}
+          onDeleteItem={handleDeleteGoal}
+          onEditItem={handleEditGoal}
+          placeholder="Add a goal..."
+        />
         <KeepWidget
           title="Todos"
           icon={<ListTodo size={18} />}
