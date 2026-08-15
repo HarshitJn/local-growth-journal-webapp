@@ -26,18 +26,29 @@ It is completely client-side, local-first, and serverless. Your private keys and
 
 ---
 
-## 🚀 One-Click Quick Launch (macOS)
+## 🚀 One-Click Quick Launch (Cross-Platform)
 
-If you are on a Mac, you can set up and start the application instantly with zero terminal configuration:
+You can set up and start the application instantly with zero manual terminal configuration on any laptop:
 
-1. Double-click the **`start.command`** file in your project folder. 
-   *(Note: If you do not have Node.js installed, the script will automatically install it via Homebrew or download/open the official macOS installer for you!)* 
+###  macOS
+Double-click the **`start.command`** file in your Finder.
+- *(Note: If Node.js is missing, the script will automatically install it via Homebrew or download/open the official macOS pkg installer for you!)*
 
-*What this script does:*
-- Opens the terminal window and points it to the app folder.
-- Installs all local dependencies (`npm install`) automatically on first run.
-- Starts the local web server.
-- Opens **Google Chrome** automatically to the application page.
+### ❖ Windows
+Double-click the **`start.bat`** file in your File Explorer.
+- *(Note: If Node.js is missing, the script will automatically run PowerShell in the background to download the official Windows `.msi` installer and open it for you!)*
+
+### 🐧 Linux / Bash Shell
+Run the shell script in your terminal:
+```bash
+chmod +x start.sh && ./start.sh
+```
+
+*What these scripts automate:*
+- Opens the command line window and directs it to the project folder.
+- Automatically runs package installation (`npm install`) on first launch.
+- Starts the local dev web server.
+- Opens **Google Chrome** automatically to the local web page (`http://localhost:5173`).
 
 ---
 
