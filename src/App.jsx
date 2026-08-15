@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw } from 'lucide-react';
+import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw, CheckCircle, Info } from 'lucide-react';
 import './App.css';
 
 // Component imports
@@ -33,6 +33,20 @@ function App() {
     quotes: false,
   });
   const [errorMsg, setErrorMsg] = useState('');
+  const [toast, setToast] = useState({ message: '', type: 'info', visible: false });
+
+  const showToast = (message, type = 'info') => {
+    setToast({ message, type, visible: true });
+  };
+
+  useEffect(() => {
+    if (toast.visible) {
+      const timer = setTimeout(() => {
+        setToast((prev) => ({ ...prev, visible: false }));
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.visible]);
 
   // Load initial data on mount
   useEffect(() => {
@@ -56,16 +70,30 @@ function App() {
   }, []);
 
   const handleSendLog = async (text) => {
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
+
     // 1. Create and save the new log immediately locally
     const newLog = {
       id: Date.now().toString(),
       timestamp: Date.now(),
-      text: text,
+      text: trimmedText,
     };
     const updatedLogs = [...logs, newLog];
     setLogs(updatedLogs);
     saveJournalData({ logs: updatedLogs, widgets });
     setErrorMsg('');
+
+    // Check if the entry is trivial (less than 3 words or standard greeting noise)
+    const trivialWords = ['test', 'hello', 'hi', 'ok', 'okay', 'cool', 'thanks', 'yes', 'no', 'bye'];
+    const cleanWord = trimmedText.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+    const words = trimmedText.split(/\s+/);
+    const isTrivial = words.length < 3 || trivialWords.includes(cleanWord);
+
+    if (isTrivial) {
+      showToast("No new insights found. (0 tokens used)", "info");
+      return;
+    }
 
     // 2. If API Key is not set, alert user but keep log
     if (!apiKey) {
@@ -78,12 +106,17 @@ function App() {
     try {
       const { insights, usage } = await analyzeJournal(updatedLogs, provider, apiKey, modelName);
       
+      // Determine if there is any difference between the old and new insights
+      const hasChanged = JSON.stringify(insights) !== JSON.stringify(widgets);
+      
       // Update widgets state and persist
       setWidgets(insights);
       saveJournalData({ logs: updatedLogs, widgets: insights });
 
       // Record token usage and cost
+      let totalTokens = 0;
       if (usage && (usage.inputTokens > 0 || usage.outputTokens > 0)) {
+        totalTokens = usage.inputTokens + usage.outputTokens;
         const cost = calculateCost(provider, modelName, usage.inputTokens, usage.outputTokens);
         saveUsageRecord({
           provider,
@@ -92,6 +125,12 @@ function App() {
           outputTokens: usage.outputTokens,
           cost
         });
+      }
+
+      if (hasChanged) {
+        showToast("Insights updated!", "success");
+      } else {
+        showToast(`No new insights found. (${totalTokens} tokens used)`, "info");
       }
     } catch (err) {
       console.error(err);
@@ -307,6 +346,17 @@ function App() {
         <UsageStatsModal />
         <APIKeyModal />
       </div>
+
+      {toast.visible && (
+        <div className={`toast-notification ${toast.type}`}>
+          {toast.type === 'success' ? (
+            <CheckCircle size={16} style={{ color: 'var(--accent)' }} />
+          ) : (
+            <Info size={16} style={{ color: 'var(--text-secondary)' }} />
+          )}
+          <span>{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 }
