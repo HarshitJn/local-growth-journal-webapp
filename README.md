@@ -52,7 +52,7 @@ chmod +x start.sh && ./start.sh
 
 ---
 
-## 🛠️ Manual Terminal Installation
+## 🛠️ Manual Terminal Installation (if above fails)
 
 ### 1. Clone the repository
 ```bash
