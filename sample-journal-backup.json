@@ -1,0 +1,154 @@
+{
+  "logs": [
+    {
+      "id": "log-1",
+      "text": "Stared at the gym mirror today. Deadlift is still stuck at 90kg. It feels like I've been hitting the same plateau for weeks, and my bench press progress is practically non-existent. I'm trying to remain patient, but it's hard not to feel discouraged when putting in the hours.",
+      "timestamp": 1785661200000
+    },
+    {
+      "id": "log-2",
+      "text": "Took a hard hit on my trading account today. NIFTY 50 took a sudden downturn right after the morning bell, and my long call options expired completely worthless. Wiped out about two weeks of hard-earned gains in just three hours. My chest feels tight; I need to practice better risk management.",
+      "timestamp": 1785747600000
+    },
+    {
+      "id": "log-3",
+      "text": "Late night football match. Watched Arsenal pull off an incredible 90th-minute comeback victory. The raw excitement of seeing the stadium erupt, even through a screen, was electric. For a couple of hours, I completely forgot about my trading losses and code bugs. Sports have a magical way of uniting focus.",
+      "timestamp": 1785801600000
+    },
+    {
+      "id": "log-4",
+      "text": "Riding the metro today, I looked up. Literally everyone—teens, business executives, older folks—was hunched over, scrolling mindlessly on their screens. A sea of people, yet completely silent and isolated. It made me feel incredibly disconnected from the modern world. We are more networked than ever, yet so lonely.",
+      "timestamp": 1785834000000
+    },
+    {
+      "id": "log-5",
+      "text": "Wasted three hours scrolling reels on Instagram this evening. I kept promising myself 'just one more,' but the algorithm has my brain hijacked. When I finally closed the app, I felt sluggish, uninspired, and full of passive self-loathing. I need to regain control over my attention span.",
+      "timestamp": 1785920400000
+    },
+    {
+      "id": "log-6",
+      "text": "Decided to run outside today instead of using the gym treadmill. Legs felt heavy, and my breathing was shallow. Progress is slow, and my physical stamina is definitely not where I want it to be. Still, I pushed through 3 kilometers. It's better than sitting on the couch.",
+      "timestamp": 1786006800000
+    },
+    {
+      "id": "log-7",
+      "text": "Made a basic garlic, olive oil, and cherry tomato pasta from scratch today. Cooking feels like a quiet meditation—the chopping, the sizzling, the steam. It was simple, but eating something I prepared myself brought a sense of peace that takeout never does.",
+      "timestamp": 1786093200000
+    },
+    {
+      "id": "log-8",
+      "text": "NIFTY 50 index is consolidated. Tried to short the breakdown, but got whipped out on a false stop-trigger. Lost another chunk of capital. Trading is emotional warfare. I need to stop revenge trading when the market doesn't go my way.",
+      "timestamp": 1786179600000
+    },
+    {
+      "id": "log-9",
+      "text": "Spent my evening watching the Wimbledon highlights. Seeing the intense focus and supreme physical fitness of the players was awe-inspiring. It makes me want to get back to my own training with renewed focus, stalling bench presses aside.",
+      "timestamp": 1786266000000
+    },
+    {
+      "id": "log-10",
+      "text": "Deleted Instagram and TikTok from my phone today. The initial urge to open them is like a phantom itch in my thumb. But already, my day feels longer, and the silence in my room doesn't feel as scary. I want my focus back.",
+      "timestamp": 1786352400000
+    },
+    {
+      "id": "log-11",
+      "text": "Began refactoring the legacy API caching system at work today. The codebase is a tangled mess of old promises and undocumented endpoints. It felt incredibly intimidating, but I spent the day drawing diagram maps. Step by step.",
+      "timestamp": 1786438800000
+    },
+    {
+      "id": "log-12",
+      "text": "Took a quiet sunset walk around the neighborhood. No phone, no music, just the ambient sounds of birds, passing cars, and the wind. It's amazing how much mental debris clears out when you just let yourself exist in the physical space.",
+      "timestamp": 1786525200000
+    },
+    {
+      "id": "log-13",
+      "text": "Felt that familiar wave of modern isolation tonight. Decided to call my parents. Hearing their voices and talking about mundane things—the garden, the neighbors—grounded me instantly. Real human connection doesn't happen on public feeds; it happens in private conversations.",
+      "timestamp": 1786611600000
+    },
+    {
+      "id": "log-14",
+      "text": "Another discouraging day at the gym. Felt weak during my overhead presses, and my scale weight hasn't budged in weeks. I'm starting to think my nutrition is off. I need to track my macros more diligently instead of just guessing.",
+      "timestamp": 1786698000000
+    },
+    {
+      "id": "log-15",
+      "text": "NIFTY 50 broke out on a massive rally. I stayed disciplined, followed my system, and took a small, controlled trade that hit its profit target. No huge wins, but keeping my emotions in check after last week's losses feels like a victory in itself.",
+      "timestamp": 1786784400000
+    },
+    {
+      "id": "log-16",
+      "text": "Joy of watching sports again—tuned in to watch the cricket championship. The tension of the final overs was incredible. Watching sports is such a pure release of dopamine; it makes me feel part of a massive, shared human emotion, bridging the usual isolation.",
+      "timestamp": 1786870800000
+    },
+    {
+      "id": "log-17",
+      "text": "Felt completely disconnected while scrolling through developer forums today. Everyone is arguing about frameworks, showing off setups, or complaining. It feels like an echo chamber. I want to build things that matter to me, not win online arguments.",
+      "timestamp": 1786957200000
+    },
+    {
+      "id": "log-18",
+      "text": "Reinstalled Instagram because I felt left out of a friend's group joke. Ten minutes later, I was back to mindless scrolling and comparing my life to vacation snapshots. Uninstalled it again. The loop is insidious.",
+      "timestamp": 1787043600000
+    },
+    {
+      "id": "log-19",
+      "text": "Invited two friends over and cooked them a fresh pasta dinner. We talked for hours without looking at our phones once. The warmth of the food, the laughter, and the shared space made me realize that combatting isolation requires deliberate, physical effort.",
+      "timestamp": 1787130000000
+    },
+    {
+      "id": "log-20",
+      "text": "Finally had a decent workout. Didn't break any personal records, but my form felt rock solid and I felt a strong mind-muscle connection. Progress is not a straight line; sometimes just turning up and moving well is the win.",
+      "timestamp": 1787216400000
+    },
+    {
+      "id": "log-21",
+      "text": "Successfully shipped the first stage of the API refactoring today. My cache tests passed with zero errors. It felt amazing to see the logs run clean after days of intimidating complexity. Persistence paid off.",
+      "timestamp": 1787302800000
+    },
+    {
+      "id": "log-22",
+      "text": "NIFTY 50 was highly volatile today. I stayed out of the market entirely. Recognizing when *not* to trade is a major psychological milestone for me. Preserving capital is just as important as growing it.",
+      "timestamp": 1787389200000
+    },
+    {
+      "id": "log-23",
+      "text": "Early morning walk at 6 AM. The air was cool, and the city was still half asleep. These morning walks are slowly becoming my daily sanctuary. It sets a peaceful baseline for my mind before the digital noise starts.",
+      "timestamp": 1787475600000
+    },
+    {
+      "id": "log-24",
+      "text": "Drafted my first public post explaining my caching logic for Twitter/X. It feels vulnerable to put my work out there, but I am learning to treat social media as a notebook to share value, rather than a feed to seek approval.",
+      "timestamp": 1787562000000
+    },
+    {
+      "id": "log-25",
+      "text": "Reflecting on this past month. Between trading losses, stalled gym progress, and digital noise, I've had to fight for my focus. But clean cooking, long walks, and genuine friendships are keeping me steady. I am building resilience.",
+      "timestamp": 1787648400000
+    }
+  ],
+  "widgets": {
+    "problems": [
+      "I get distracted by phone scrolling and comparison loops.",
+      "I struggle with emotional discipline after trading losses in NIFTY 50.",
+      "I feel isolated by the passive, digital-first modern culture.",
+      "I am hitting a physical progress plateau with my gym lifts."
+    ],
+    "learnings": [
+      "I learned that offline sunset walks clear mental debris.",
+      "I realized that preserving capital in trading is as important as making wins.",
+      "I discovered that sports bring shared, screen-clearing joy.",
+      "I realized that real human connection requires deliberate offline effort."
+    ],
+    "strengths": [
+      "I show resilience when recovering from financial trading setbacks.",
+      "I exercise discipline by uninstalling toxic social media feeds.",
+      "I show persistence in tackling complex legacy software refactoring.",
+      "I maintain commitment to my health despite stalled gym gains."
+    ],
+    "quotes": [
+      "My progress is not a straight line, but my commitment to show up is constant.",
+      "I find genuine connection in private conversations, and quiet peace in physical spaces.",
+      "Capital and focus are resources; I must protect them from unnecessary noise."
+    ]
+  }
+}

@@ -1,0 +1,77 @@
+:root {
+  /* Peace and Zen Theme - Light Mode */
+  --bg-gradient: linear-gradient(135deg, #f0f4f1 0%, #e2ebd9 100%);
+  --card-bg: rgba(255, 255, 255, 0.65);
+  --card-border: rgba(255, 255, 255, 0.5);
+  --text-primary: #2d382e;
+  --text-secondary: #58685b;
+  --accent: #4c7c59;
+  --accent-light: rgba(76, 124, 89, 0.1);
+  --accent-border: rgba(76, 124, 89, 0.3);
+  --shadow: 0 10px 30px -10px rgba(76, 124, 89, 0.15);
+  --input-bg: rgba(255, 255, 255, 0.8);
+  --input-border: rgba(76, 124, 89, 0.2);
+  --font-sans: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Peace and Zen Theme - Dark Mode */
+    --bg-gradient: linear-gradient(135deg, #0e130f 0%, #151d18 100%);
+    --card-bg: rgba(21, 29, 24, 0.7);
+    --card-border: rgba(255, 255, 255, 0.05);
+    --text-primary: #e3ede5;
+    --text-secondary: #9cb0a0;
+    --accent: #68a379;
+    --accent-light: rgba(104, 163, 121, 0.15);
+    --accent-border: rgba(104, 163, 121, 0.4);
+    --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    --input-bg: rgba(21, 29, 24, 0.85);
+    --input-border: rgba(104, 163, 121, 0.3);
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  min-height: 100vh;
+  min-height: 100dvh;
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background 0.5s ease, color 0.3s ease;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Beautiful custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-border);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
