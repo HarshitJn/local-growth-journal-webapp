@@ -654,3 +654,16 @@
     transform: translate(-50%, 0);
   }
 }
+
+/* Sparkles Force Generate button */
+.sparkles-btn:hover {
+  border-color: #dca842 !important;
+  color: #dca842 !important;
+  transform: scale(1.05);
+}
+
+.sparkles-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}

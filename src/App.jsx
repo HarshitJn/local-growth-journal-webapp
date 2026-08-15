@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw, CheckCircle, Info } from 'lucide-react';
+import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw, CheckCircle, Info, Sparkles } from 'lucide-react';
 import './App.css';
 
 // Component imports
@@ -262,6 +262,42 @@ function App() {
     }
   };
 
+  const handleForceRegenerateAll = async () => {
+    if (logs.length === 0) {
+      alert("You need at least one journal entry to generate insights.");
+      return;
+    }
+    if (!apiKey) {
+      setErrorMsg(`To generate insights, configure your ${provider.toUpperCase()} API Key in the bottom-right.`);
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMsg('');
+    try {
+      const { insights, usage } = await analyzeJournal(logs, provider, apiKey, modelName);
+      setWidgets(insights);
+      saveJournalData({ logs, widgets: insights });
+
+      if (usage && (usage.inputTokens > 0 || usage.outputTokens > 0)) {
+        const cost = calculateCost(provider, modelName, usage.inputTokens, usage.outputTokens);
+        saveUsageRecord({
+          provider,
+          model: modelName,
+          inputTokens: usage.inputTokens,
+          outputTokens: usage.outputTokens,
+          cost
+        });
+      }
+      showToast("All insights updated!", "success");
+    } catch (err) {
+      console.error(err);
+      setErrorMsg('Failed to regenerate insights: ' + (err.message || 'Check your key or network connection.'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="app-container">
       {/* Column 1: Left Widgets */}
@@ -343,6 +379,15 @@ function App() {
       {/* Bottom Floating Utilities */}
       <BackupControl onDataImported={handleDataImported} onClearAll={handleClearAllData} />
       <div className="bottom-right-controls">
+        <button
+          onClick={handleForceRegenerateAll}
+          disabled={isLoading || logs.length === 0}
+          className="settings-btn sparkles-btn"
+          title="Force Update All Insights"
+          style={{ transition: 'all 0.2s ease' }}
+        >
+          <Sparkles size={20} className={isLoading ? 'spinner' : ''} />
+        </button>
         <UsageStatsModal />
         <APIKeyModal />
       </div>
