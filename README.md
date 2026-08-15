@@ -30,8 +30,8 @@ It is completely client-side, local-first, and serverless. Your private keys and
 
 If you are on a Mac, you can set up and start the application instantly with zero terminal configuration:
 
-1. Ensure you have [Node.js](https://nodejs.org) installed on your system.
-2. Double-click the **`start.command`** file in your project folder. 
+1. Double-click the **`start.command`** file in your project folder. 
+   *(Note: If you do not have Node.js installed, the script will automatically install it via Homebrew or download/open the official macOS installer for you!)* 
 
 *What this script does:*
 - Opens the terminal window and points it to the app folder.
