@@ -583,6 +583,7 @@ function App() {
       className="app-container"
       style={{
         gridTemplateColumns: windowWidth > 1100 ? `${sidebarWidth}px 1fr ${sidebarWidth}px` : undefined,
+        maxWidth: windowWidth > 1100 ? `min(98vw, ${720 + sidebarWidth * 2 + 48}px)` : undefined,
         userSelect: isResizing ? 'none' : 'auto'
       }}
     >
