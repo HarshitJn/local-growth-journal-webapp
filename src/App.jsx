@@ -35,6 +35,12 @@ function App() {
   const [personalOrder, setPersonalOrder] = useState(['goals', 'todos']);
   const [draggedAiKey, setDraggedAiKey] = useState(null);
   const [draggedPersonalKey, setDraggedPersonalKey] = useState(null);
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const saved = localStorage.getItem('AI_JOURNAL_SIDEBAR_WIDTH');
+    return saved ? parseInt(saved, 10) : 320;
+  });
+  const [isResizing, setIsResizing] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isLoading, setIsLoading] = useState(false);
   const [widgetLoading, setWidgetLoading] = useState({
     problems: false,
@@ -93,6 +99,46 @@ function App() {
     pOrder = pOrder.filter(id => id === 'goals' || id === 'todos' || cWidgets.some(w => w.id === id));
     setPersonalOrder(pOrder);
   }, []);
+
+  useEffect(() => {
+    const handleResizeWindow = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResizeWindow);
+    return () => window.removeEventListener('resize', handleResizeWindow);
+  }, []);
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e) => {
+      const container = document.querySelector('.app-container');
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+
+      let calculatedWidth;
+      if (isResizing === 'left') {
+        calculatedWidth = e.clientX - rect.left;
+      } else if (isResizing === 'right') {
+        calculatedWidth = rect.right - e.clientX;
+      }
+
+      if (calculatedWidth) {
+        const clamped = Math.min(Math.max(Math.round(calculatedWidth), 240), 500);
+        setSidebarWidth(clamped);
+        localStorage.setItem('AI_JOURNAL_SIDEBAR_WIDTH', clamped.toString());
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(null);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   const handleSendLog = async (text) => {
     const trimmedText = text.trim();
@@ -530,9 +576,29 @@ function App() {
   };
 
   return (
-    <div className="app-container">
+    <div 
+      className="app-container"
+      style={{
+        gridTemplateColumns: windowWidth > 1100 ? `${sidebarWidth}px 1fr ${sidebarWidth}px` : undefined,
+        userSelect: isResizing ? 'none' : 'auto'
+      }}
+    >
       {/* Column 1: Left Sidebar (AI Insights) */}
       <aside className="left-sidebar">
+        <div
+          className={`sidebar-resizer ${isResizing === 'left' ? 'is-dragging' : ''}`}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setIsResizing('left');
+          }}
+          onDoubleClick={() => {
+            setSidebarWidth(320);
+            localStorage.setItem('AI_JOURNAL_SIDEBAR_WIDTH', '320');
+          }}
+          title="Drag to resize sidebars symmetrically (Double-click to reset)"
+        >
+          <div className="sidebar-resizer-line" />
+        </div>
         <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Sparkles size={14} />
@@ -666,6 +732,20 @@ function App() {
 
       {/* Column 3: Right Sidebar (Personal Space - Goals & Todos) */}
       <aside className="right-sidebar">
+        <div
+          className={`sidebar-resizer ${isResizing === 'right' ? 'is-dragging' : ''}`}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setIsResizing('right');
+          }}
+          onDoubleClick={() => {
+            setSidebarWidth(320);
+            localStorage.setItem('AI_JOURNAL_SIDEBAR_WIDTH', '320');
+          }}
+          title="Drag to resize sidebars symmetrically (Double-click to reset)"
+        >
+          <div className="sidebar-resizer-line" />
+        </div>
         <div className="sidebar-header">
           <BookOpen size={14} />
           <span>Personal Space</span>
