@@ -101,19 +101,13 @@
   pointer-events: none;
 }
 
-.sidebar-resizer-pill {
-  width: 20px;
-  height: 38px;
-  background: var(--card-bg);
-  border: 1px solid var(--accent);
-  border-radius: 10px;
+.sidebar-resizer-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  opacity: 0.45;
-  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  opacity: 0.4;
+  transition: opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease;
   z-index: 2;
   pointer-events: none;
 }
@@ -123,11 +117,11 @@
   opacity: 0.5;
 }
 
-.sidebar-resizer:hover .sidebar-resizer-pill,
-.sidebar-resizer.is-dragging .sidebar-resizer-pill {
+.sidebar-resizer:hover .sidebar-resizer-icon,
+.sidebar-resizer.is-dragging .sidebar-resizer-icon {
   opacity: 1;
-  transform: scale(1.15);
-  box-shadow: 0 0 12px rgba(76, 124, 89, 0.5);
+  transform: scale(1.25);
+  filter: drop-shadow(0 0 6px rgba(76, 124, 89, 0.7));
 }
 
 @media (max-width: 1100px) {

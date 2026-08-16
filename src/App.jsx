@@ -604,8 +604,8 @@ function App() {
             title="Drag to resize sidebars symmetrically (Double-click to reset)"
           >
             <div className="sidebar-resizer-line" />
-            <div className="sidebar-resizer-pill">
-              <ChevronsLeftRight size={12} />
+            <div className="sidebar-resizer-icon">
+              <ChevronsLeftRight size={18} />
             </div>
           </div>
           <div
@@ -622,8 +622,8 @@ function App() {
             title="Drag to resize sidebars symmetrically (Double-click to reset)"
           >
             <div className="sidebar-resizer-line" />
-            <div className="sidebar-resizer-pill">
-              <ChevronsLeftRight size={12} />
+            <div className="sidebar-resizer-icon">
+              <ChevronsLeftRight size={18} />
             </div>
           </div>
         </>
