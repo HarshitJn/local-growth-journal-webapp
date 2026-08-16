@@ -1,5 +1,6 @@
 import React from 'react';
 import { Eraser, RefreshCw } from 'lucide-react';
+import WittyTooltip from './WittyTooltip';
 
 /**
  * Modular Widget Card component with per-widget erase and refresh actions.
@@ -27,6 +28,7 @@ export default function Widget({
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div className="widget-icon">{icon}</div>
           <h3 className="widget-title">{title}</h3>
+          <WittyTooltip section={title} />
         </div>
         
         <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, CheckSquare, Square, Check } from 'lucide-react';
+import WittyTooltip from './WittyTooltip';
 
 /**
  * Google Keep style Todo/Goal widget with inline adding, editing, and toggling.
@@ -52,6 +53,7 @@ export default function KeepWidget({
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div className="widget-icon">{icon}</div>
           <h3 className="widget-title">{title}</h3>
+          <WittyTooltip section={title} />
         </div>
         {onDeleteWidget && (
           <button

@@ -472,9 +472,31 @@ function App() {
     <div className="app-container">
       {/* Column 1: Left Sidebar (AI Insights) */}
       <aside className="left-sidebar">
-        <div className="sidebar-header">
-          <Sparkles size={14} />
-          <span>AI Insights</span>
+        <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Sparkles size={14} />
+            <span>AI Insights</span>
+          </div>
+          <button
+            onClick={handleForceRegenerateAll}
+            disabled={isLoading || logs.length === 0}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '4px',
+              borderRadius: '4px',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            title="Force Update All Insights"
+          >
+            <RefreshCw size={14} className={isLoading ? 'spinner' : ''} style={{ transition: 'all 0.2s ease' }} />
+          </button>
         </div>
         <Widget
           title="Current Problems"
@@ -702,15 +724,6 @@ function App() {
       {/* Bottom Floating Utilities */}
       <BackupControl onDataImported={handleDataImported} onClearAll={handleClearAllData} />
       <div className="bottom-right-controls">
-        <button
-          onClick={handleForceRegenerateAll}
-          disabled={isLoading || logs.length === 0}
-          className="settings-btn sparkles-btn"
-          title="Force Update All Insights"
-          style={{ transition: 'all 0.2s ease' }}
-        >
-          <Sparkles size={20} className={isLoading ? 'spinner' : ''} />
-        </button>
         <UsageStatsModal />
         <APIKeyModal />
       </div>

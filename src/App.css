@@ -717,3 +717,61 @@
   background-color: rgba(46, 73, 54, 0.1) !important;
   border-color: var(--accent-border) !important;
 }
+
+/* Glassmorphic CSS Tooltip styles */
+.tooltip-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tooltip-container:hover .info-hover-icon {
+  opacity: 1 !important;
+  color: var(--accent) !important;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: rgba(30, 41, 59, 0.95);
+  border: 1px solid var(--card-border);
+  color: #f1f5f9;
+  text-align: center;
+  border-radius: 8px;
+  padding: 8px 12px;
+  position: absolute;
+  z-index: 100;
+  bottom: 130%; /* Position above the icon */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  font-size: 0.7rem;
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.45;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: none; /* Prevent blocking hover on other elements */
+  text-transform: none; /* Do not inherit uppercase */
+  letter-spacing: normal;
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--card-border) transparent transparent transparent;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
