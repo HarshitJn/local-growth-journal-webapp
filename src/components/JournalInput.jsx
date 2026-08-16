@@ -10,7 +10,7 @@ export default function JournalInput({ onSend, isLoading, provider = 'gemini' })
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 160)}px`;
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 220)}px`;
     }
   }, [text]);
 

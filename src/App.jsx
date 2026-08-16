@@ -583,27 +583,48 @@ function App() {
       className="app-container"
       style={{
         gridTemplateColumns: windowWidth > 1100 ? `${sidebarWidth}px 1fr ${sidebarWidth}px` : undefined,
-        maxWidth: windowWidth > 1100 ? `min(98vw, ${720 + sidebarWidth * 2 + 48}px)` : undefined,
+        maxWidth: windowWidth > 1100 ? `min(98vw, ${936 + sidebarWidth * 2 + 48}px)` : undefined,
         userSelect: isResizing ? 'none' : 'auto'
       }}
     >
+      {/* Outer Symmetrical Resizers */}
+      {windowWidth > 1100 && (
+        <>
+          <div
+            className={`sidebar-resizer resizer-left ${isResizing === 'left' ? 'is-dragging' : ''}`}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              dragStartRef.current = { startX: e.clientX, startWidth: sidebarWidth };
+              setIsResizing('left');
+            }}
+            onDoubleClick={() => {
+              setSidebarWidth(320);
+              localStorage.setItem('AI_JOURNAL_SIDEBAR_WIDTH', '320');
+            }}
+            title="Drag to resize sidebars symmetrically (Double-click to reset)"
+          >
+            <div className="sidebar-resizer-line" />
+          </div>
+          <div
+            className={`sidebar-resizer resizer-right ${isResizing === 'right' ? 'is-dragging' : ''}`}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              dragStartRef.current = { startX: e.clientX, startWidth: sidebarWidth };
+              setIsResizing('right');
+            }}
+            onDoubleClick={() => {
+              setSidebarWidth(320);
+              localStorage.setItem('AI_JOURNAL_SIDEBAR_WIDTH', '320');
+            }}
+            title="Drag to resize sidebars symmetrically (Double-click to reset)"
+          >
+            <div className="sidebar-resizer-line" />
+          </div>
+        </>
+      )}
+
       {/* Column 1: Left Sidebar (AI Insights) */}
       <aside className="left-sidebar">
-        <div
-          className={`sidebar-resizer ${isResizing === 'left' ? 'is-dragging' : ''}`}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            dragStartRef.current = { startX: e.clientX, startWidth: sidebarWidth };
-            setIsResizing('left');
-          }}
-          onDoubleClick={() => {
-            setSidebarWidth(320);
-            localStorage.setItem('AI_JOURNAL_SIDEBAR_WIDTH', '320');
-          }}
-          title="Drag to resize sidebars symmetrically (Double-click to reset)"
-        >
-          <div className="sidebar-resizer-line" />
-        </div>
         <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Sparkles size={14} />
@@ -737,21 +758,6 @@ function App() {
 
       {/* Column 3: Right Sidebar (Personal Space - Goals & Todos) */}
       <aside className="right-sidebar">
-        <div
-          className={`sidebar-resizer ${isResizing === 'right' ? 'is-dragging' : ''}`}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            dragStartRef.current = { startX: e.clientX, startWidth: sidebarWidth };
-            setIsResizing('right');
-          }}
-          onDoubleClick={() => {
-            setSidebarWidth(320);
-            localStorage.setItem('AI_JOURNAL_SIDEBAR_WIDTH', '320');
-          }}
-          title="Drag to resize sidebars symmetrically (Double-click to reset)"
-        >
-          <div className="sidebar-resizer-line" />
-        </div>
         <div className="sidebar-header">
           <BookOpen size={14} />
           <span>Personal Space</span>
