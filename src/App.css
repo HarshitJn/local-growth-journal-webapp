@@ -82,11 +82,11 @@
 }
 
 .left-sidebar .sidebar-resizer {
-  right: -14px;
+  left: -14px;
 }
 
 .right-sidebar .sidebar-resizer {
-  left: -14px;
+  right: -14px;
 }
 
 .sidebar-resizer-line {

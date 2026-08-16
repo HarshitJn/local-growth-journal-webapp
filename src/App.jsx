@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw, CheckCircle, Info, Sparkles, Target, ListTodo, Plus, Folder } from 'lucide-react';
 import './App.css';
 
@@ -39,6 +39,7 @@ function App() {
     const saved = localStorage.getItem('AI_JOURNAL_SIDEBAR_WIDTH');
     return saved ? parseInt(saved, 10) : 320;
   });
+  const dragStartRef = useRef({ startX: 0, startWidth: 320 });
   const [isResizing, setIsResizing] = useState(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isLoading, setIsLoading] = useState(false);
@@ -110,19 +111,21 @@ function App() {
     if (!isResizing) return;
 
     const handleMouseMove = (e) => {
-      const container = document.querySelector('.app-container');
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-
+      const { startX, startWidth } = dragStartRef.current;
       let calculatedWidth;
+
       if (isResizing === 'left') {
-        calculatedWidth = e.clientX - rect.left;
+        // Outer left handle: dragging left (smaller X) expands width outwards!
+        const delta = startX - e.clientX;
+        calculatedWidth = startWidth + delta;
       } else if (isResizing === 'right') {
-        calculatedWidth = rect.right - e.clientX;
+        // Outer right handle: dragging right (larger X) expands width outwards!
+        const delta = e.clientX - startX;
+        calculatedWidth = startWidth + delta;
       }
 
       if (calculatedWidth) {
-        const clamped = Math.min(Math.max(Math.round(calculatedWidth), 240), 500);
+        const clamped = Math.min(Math.max(Math.round(calculatedWidth), 240), 520);
         setSidebarWidth(clamped);
         localStorage.setItem('AI_JOURNAL_SIDEBAR_WIDTH', clamped.toString());
       }
@@ -589,6 +592,7 @@ function App() {
           className={`sidebar-resizer ${isResizing === 'left' ? 'is-dragging' : ''}`}
           onMouseDown={(e) => {
             e.preventDefault();
+            dragStartRef.current = { startX: e.clientX, startWidth: sidebarWidth };
             setIsResizing('left');
           }}
           onDoubleClick={() => {
@@ -736,6 +740,7 @@ function App() {
           className={`sidebar-resizer ${isResizing === 'right' ? 'is-dragging' : ''}`}
           onMouseDown={(e) => {
             e.preventDefault();
+            dragStartRef.current = { startX: e.clientX, startWidth: sidebarWidth };
             setIsResizing('right');
           }}
           onDoubleClick={() => {
