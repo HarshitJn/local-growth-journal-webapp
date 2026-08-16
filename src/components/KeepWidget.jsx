@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, CheckSquare, Square, Check } from 'lucide-react';
+import { Plus, Trash2, CheckSquare, Square, Check, GripVertical } from 'lucide-react';
 import WittyTooltip from './WittyTooltip';
 
 /**
@@ -14,7 +14,11 @@ export default function KeepWidget({
   onDeleteItem,
   onEditItem,
   placeholder = "Add new item...",
-  onDeleteWidget
+  onDeleteWidget,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
+  onDrop
 }) {
   const [inputText, setInputText] = useState('');
   const [editingId, setEditingId] = useState(null);
@@ -47,10 +51,30 @@ export default function KeepWidget({
     }
   };
 
+  const [canDrag, setCanDrag] = useState(false);
+
   return (
-    <div className="widget-card keep-card">
+    <div 
+      className="widget-card keep-card"
+      draggable={canDrag}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragEnd={(e) => {
+        setCanDrag(false);
+        if (onDragEnd) onDragEnd(e);
+      }}
+      onDrop={onDrop}
+    >
       <div className="widget-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <GripVertical
+            size={14}
+            style={{ cursor: 'grab', color: 'var(--text-secondary)', opacity: 0.4 }}
+            onMouseDown={() => setCanDrag(true)}
+            onMouseLeave={() => setCanDrag(false)}
+            className="drag-handle"
+            title="Drag to reorder"
+          />
           <div className="widget-icon">{icon}</div>
           <h3 className="widget-title">{title}</h3>
           <WittyTooltip section={title} />

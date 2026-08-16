@@ -31,6 +31,10 @@ function App() {
   const [customWidgets, setCustomWidgets] = useState([]);
   const [runningSummary, setRunningSummary] = useState('');
   const [isAddingWidget, setIsAddingWidget] = useState(false);
+  const [aiOrder, setAiOrder] = useState(['problems', 'learnings', 'strengths', 'quotes']);
+  const [personalOrder, setPersonalOrder] = useState(['goals', 'todos']);
+  const [draggedAiKey, setDraggedAiKey] = useState(null);
+  const [draggedPersonalKey, setDraggedPersonalKey] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [widgetLoading, setWidgetLoading] = useState({
     problems: false,
@@ -75,8 +79,19 @@ function App() {
     });
     setGoals(data.goals || []);
     setTodos(data.todos || []);
-    setCustomWidgets(data.customWidgets || []);
+    const cWidgets = data.customWidgets || [];
+    setCustomWidgets(cWidgets);
     setRunningSummary(data.runningSummary || '');
+    setAiOrder(data.aiOrder || ['problems', 'learnings', 'strengths', 'quotes']);
+
+    let pOrder = data.personalOrder || ['goals', 'todos'];
+    cWidgets.forEach(w => {
+      if (!pOrder.includes(w.id)) {
+        pOrder.push(w.id);
+      }
+    });
+    pOrder = pOrder.filter(id => id === 'goals' || id === 'todos' || cWidgets.some(w => w.id === id));
+    setPersonalOrder(pOrder);
   }, []);
 
   const handleSendLog = async (text) => {
@@ -465,7 +480,53 @@ function App() {
       return w;
     });
     setCustomWidgets(updated);
-    saveJournalData({ logs, widgets, goals, todos, customWidgets: updated, runningSummary });
+    saveJournalData({ logs, widgets, goals, todos, customWidgets: updated, runningSummary, aiOrder, personalOrder });
+  };
+
+  // Drag and Drop handlers for AI Insights (Left Sidebar)
+  const handleAiDragStart = (e, key) => {
+    setDraggedAiKey(key);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleAiDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleAiDrop = (e, targetKey) => {
+    e.preventDefault();
+    if (!draggedAiKey || draggedAiKey === targetKey) return;
+    const sourceIndex = aiOrder.indexOf(draggedAiKey);
+    const targetIndex = aiOrder.indexOf(targetKey);
+    const updated = [...aiOrder];
+    updated.splice(sourceIndex, 1);
+    updated.splice(targetIndex, 0, draggedAiKey);
+    setAiOrder(updated);
+    saveJournalData({ logs, widgets, goals, todos, customWidgets, runningSummary, aiOrder: updated, personalOrder });
+    setDraggedAiKey(null);
+  };
+
+  // Drag and Drop handlers for Personal Space (Right Sidebar)
+  const handlePersonalDragStart = (e, id) => {
+    setDraggedPersonalKey(id);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handlePersonalDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handlePersonalDrop = (e, targetId) => {
+    e.preventDefault();
+    if (!draggedPersonalKey || draggedPersonalKey === targetId) return;
+    const sourceIndex = personalOrder.indexOf(draggedPersonalKey);
+    const targetIndex = personalOrder.indexOf(targetId);
+    const updated = [...personalOrder];
+    updated.splice(sourceIndex, 1);
+    updated.splice(targetIndex, 0, draggedPersonalKey);
+    setPersonalOrder(updated);
+    saveJournalData({ logs, widgets, goals, todos, customWidgets, runningSummary, aiOrder, personalOrder: updated });
+    setDraggedPersonalKey(null);
   };
 
   return (
@@ -498,42 +559,77 @@ function App() {
             <RefreshCw size={14} className={isLoading ? 'spinner' : ''} style={{ transition: 'all 0.2s ease' }} />
           </button>
         </div>
-        <Widget
-          title="Current Problems"
-          icon={<AlertCircle size={18} />}
-          items={widgets.problems}
-          emptyText="No problems identified. Reflect to see struggles structured here."
-          onErase={() => handleEraseSingleWidget('problems')}
-          onRefresh={() => handleRefreshSingleWidget('problems')}
-          isLoading={widgetLoading.problems}
-        />
-        <Widget
-          title="Key Learnings"
-          icon={<Lightbulb size={18} />}
-          items={widgets.learnings}
-          emptyText="No learnings extracted yet. Lessons appear as you journal."
-          onErase={() => handleEraseSingleWidget('learnings')}
-          onRefresh={() => handleRefreshSingleWidget('learnings')}
-          isLoading={widgetLoading.learnings}
-        />
-        <Widget
-          title="Identified Strengths"
-          icon={<Shield size={18} />}
-          items={widgets.strengths}
-          emptyText="Your strengths will shine here as you write about your days."
-          onErase={() => handleEraseSingleWidget('strengths')}
-          onRefresh={() => handleRefreshSingleWidget('strengths')}
-          isLoading={widgetLoading.strengths}
-        />
-        <Widget
-          title="Key Quotes"
-          icon={<Quote size={18} />}
-          items={widgets.quotes}
-          emptyText="Memorable one-liners to carry with you throughout the day."
-          onErase={() => handleEraseSingleWidget('quotes')}
-          onRefresh={() => handleRefreshSingleWidget('quotes')}
-          isLoading={widgetLoading.quotes}
-        />
+        {aiOrder.map((key) => {
+          if (key === 'problems') {
+            return (
+              <Widget
+                key="problems"
+                title="Current Problems"
+                icon={<AlertCircle size={18} />}
+                items={widgets.problems}
+                emptyText="No problems identified. Reflect to see struggles structured here."
+                onErase={() => handleEraseSingleWidget('problems')}
+                onRefresh={() => handleRefreshSingleWidget('problems')}
+                isLoading={widgetLoading.problems}
+                onDragStart={(e) => handleAiDragStart(e, 'problems')}
+                onDragOver={handleAiDragOver}
+                onDrop={(e) => handleAiDrop(e, 'problems')}
+              />
+            );
+          }
+          if (key === 'learnings') {
+            return (
+              <Widget
+                key="learnings"
+                title="Key Learnings"
+                icon={<Lightbulb size={18} />}
+                items={widgets.learnings}
+                emptyText="No learnings extracted yet. Lessons appear as you journal."
+                onErase={() => handleEraseSingleWidget('learnings')}
+                onRefresh={() => handleRefreshSingleWidget('learnings')}
+                isLoading={widgetLoading.learnings}
+                onDragStart={(e) => handleAiDragStart(e, 'learnings')}
+                onDragOver={handleAiDragOver}
+                onDrop={(e) => handleAiDrop(e, 'learnings')}
+              />
+            );
+          }
+          if (key === 'strengths') {
+            return (
+              <Widget
+                key="strengths"
+                title="Identified Strengths"
+                icon={<Shield size={18} />}
+                items={widgets.strengths}
+                emptyText="Your strengths will shine here as you write about your days."
+                onErase={() => handleEraseSingleWidget('strengths')}
+                onRefresh={() => handleRefreshSingleWidget('strengths')}
+                isLoading={widgetLoading.strengths}
+                onDragStart={(e) => handleAiDragStart(e, 'strengths')}
+                onDragOver={handleAiDragOver}
+                onDrop={(e) => handleAiDrop(e, 'strengths')}
+              />
+            );
+          }
+          if (key === 'quotes') {
+            return (
+              <Widget
+                key="quotes"
+                title="Key Quotes"
+                icon={<Quote size={18} />}
+                items={widgets.quotes}
+                emptyText="Memorable one-liners to carry with you throughout the day."
+                onErase={() => handleEraseSingleWidget('quotes')}
+                onRefresh={() => handleRefreshSingleWidget('quotes')}
+                isLoading={widgetLoading.quotes}
+                onDragStart={(e) => handleAiDragStart(e, 'quotes')}
+                onDragOver={handleAiDragOver}
+                onDrop={(e) => handleAiDrop(e, 'quotes')}
+              />
+            );
+          }
+          return null;
+        })}
       </aside>
 
       {/* Column 2: Chat & Input */}
@@ -574,42 +670,66 @@ function App() {
           <BookOpen size={14} />
           <span>Personal Space</span>
         </div>
-        <KeepWidget
-          title="Goals"
-          icon={<Target size={18} />}
-          items={goals}
-          onAddItem={handleAddGoal}
-          onToggleItem={handleToggleGoal}
-          onDeleteItem={handleDeleteGoal}
-          onEditItem={handleEditGoal}
-          placeholder="Add a goal..."
-        />
-        <KeepWidget
-          title="Todos"
-          icon={<ListTodo size={18} />}
-          items={todos}
-          onAddItem={handleAddTodo}
-          onToggleItem={handleToggleTodo}
-          onDeleteItem={handleDeleteTodo}
-          onEditItem={handleEditTodo}
-          placeholder="Add a todo..."
-        />
-
-        {/* Custom Widgets */}
-        {customWidgets.map((widget) => (
-          <KeepWidget
-            key={widget.id}
-            title={widget.title}
-            icon={<Folder size={18} />}
-            items={widget.items}
-            onAddItem={(text) => handleAddCustomWidgetItem(widget.id, text)}
-            onToggleItem={(itemId) => handleToggleCustomWidgetItem(widget.id, itemId)}
-            onDeleteItem={(itemId) => handleDeleteCustomWidgetItem(widget.id, itemId)}
-            onEditItem={(itemId, text) => handleEditCustomWidgetItem(widget.id, itemId, text)}
-            placeholder="Add item..."
-            onDeleteWidget={() => handleDeleteCustomWidget(widget.id)}
-          />
-        ))}
+        {personalOrder.map((id) => {
+          if (id === 'goals') {
+            return (
+              <KeepWidget
+                key="goals"
+                title="Goals"
+                icon={<Target size={18} />}
+                items={goals}
+                onAddItem={handleAddGoal}
+                onToggleItem={handleToggleGoal}
+                onDeleteItem={handleDeleteGoal}
+                onEditItem={handleEditGoal}
+                placeholder="Add a goal..."
+                onDragStart={(e) => handlePersonalDragStart(e, 'goals')}
+                onDragOver={handlePersonalDragOver}
+                onDrop={(e) => handlePersonalDrop(e, 'goals')}
+              />
+            );
+          }
+          if (id === 'todos') {
+            return (
+              <KeepWidget
+                key="todos"
+                title="Todos"
+                icon={<ListTodo size={18} />}
+                items={todos}
+                onAddItem={handleAddTodo}
+                onToggleItem={handleToggleTodo}
+                onDeleteItem={handleDeleteTodo}
+                onEditItem={handleEditTodo}
+                placeholder="Add a todo..."
+                onDragStart={(e) => handlePersonalDragStart(e, 'todos')}
+                onDragOver={handlePersonalDragOver}
+                onDrop={(e) => handlePersonalDrop(e, 'todos')}
+              />
+            );
+          }
+          // Custom widgets
+          const widget = customWidgets.find(w => w.id === id);
+          if (widget) {
+            return (
+              <KeepWidget
+                key={widget.id}
+                title={widget.title}
+                icon={<Folder size={18} />}
+                items={widget.items}
+                onAddItem={(text) => handleAddCustomWidgetItem(widget.id, text)}
+                onToggleItem={(itemId) => handleToggleCustomWidgetItem(widget.id, itemId)}
+                onDeleteItem={(itemId) => handleDeleteCustomWidgetItem(widget.id, itemId)}
+                onEditItem={(itemId, text) => handleEditCustomWidgetItem(widget.id, itemId, text)}
+                placeholder="Add item..."
+                onDeleteWidget={() => handleDeleteCustomWidget(widget.id)}
+                onDragStart={(e) => handlePersonalDragStart(e, widget.id)}
+                onDragOver={handlePersonalDragOver}
+                onDrop={(e) => handlePersonalDrop(e, widget.id)}
+              />
+            );
+          }
+          return null;
+        })}
 
         {/* Add Custom Widget Button / Form */}
         {!isAddingWidget ? (

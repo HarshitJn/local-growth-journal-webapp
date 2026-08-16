@@ -102,7 +102,9 @@ export const getJournalData = () => {
     goals: [],
     todos: [],
     customWidgets: [],
-    runningSummary: ""
+    runningSummary: "",
+    aiOrder: ['problems', 'learnings', 'strengths', 'quotes'],
+    personalOrder: ['goals', 'todos']
   };
 
   if (!data) return defaultVal;
@@ -115,7 +117,9 @@ export const getJournalData = () => {
       goals: parsed.goals || [],
       todos: parsed.todos || [],
       customWidgets: parsed.customWidgets || [],
-      runningSummary: parsed.runningSummary || ""
+      runningSummary: parsed.runningSummary || "",
+      aiOrder: parsed.aiOrder || defaultVal.aiOrder,
+      personalOrder: parsed.personalOrder || defaultVal.personalOrder
     };
   } catch (e) {
     console.error('Failed to parse journal data from localStorage:', e);
@@ -153,7 +157,9 @@ export const importData = (file) => {
             goals: parsed.goals || [],
             todos: parsed.todos || [],
             customWidgets: parsed.customWidgets || [],
-            runningSummary: parsed.runningSummary || ""
+            runningSummary: parsed.runningSummary || "",
+            aiOrder: parsed.aiOrder || ['problems', 'learnings', 'strengths', 'quotes'],
+            personalOrder: parsed.personalOrder || ['goals', 'todos']
           };
           saveJournalData(normalized);
           resolve(normalized);

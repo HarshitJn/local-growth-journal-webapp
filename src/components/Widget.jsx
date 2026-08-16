@@ -1,17 +1,9 @@
-import React from 'react';
-import { Eraser, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { Eraser, RefreshCw, GripVertical } from 'lucide-react';
 import WittyTooltip from './WittyTooltip';
 
 /**
  * Modular Widget Card component with per-widget erase and refresh actions.
- * 
- * @param {string} title - The display title of the widget
- * @param {React.ReactNode} icon - The Lucide icon to display next to the title
- * @param {Array<string>} items - The list of one-liner strings
- * @param {string} emptyText - Text to show when list is empty
- * @param {Function} onErase - Callback to erase widget items
- * @param {Function} onRefresh - Callback to refresh widget items
- * @param {boolean} isLoading - Loading state for this specific widget
  */
 export default function Widget({ 
   title, 
@@ -20,12 +12,36 @@ export default function Widget({
   emptyText = "Reflection will populate this area.",
   onErase,
   onRefresh,
-  isLoading
+  isLoading,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
+  onDrop
 }) {
+  const [canDrag, setCanDrag] = useState(false);
+
   return (
-    <div className="widget-card">
+    <div 
+      className="widget-card"
+      draggable={canDrag}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragEnd={(e) => {
+        setCanDrag(false);
+        if (onDragEnd) onDragEnd(e);
+      }}
+      onDrop={onDrop}
+    >
       <div className="widget-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <GripVertical
+            size={14}
+            style={{ cursor: 'grab', color: 'var(--text-secondary)', opacity: 0.4 }}
+            onMouseDown={() => setCanDrag(true)}
+            onMouseLeave={() => setCanDrag(false)}
+            className="drag-handle"
+            title="Drag to reorder"
+          />
           <div className="widget-icon">{icon}</div>
           <h3 className="widget-title">{title}</h3>
           <WittyTooltip section={title} />
