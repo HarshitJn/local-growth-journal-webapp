@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw, CheckCircle, Info, Sparkles, Target, ListTodo, Plus, Folder } from 'lucide-react';
+import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw, CheckCircle, Info, Sparkles, Target, ListTodo, Plus, Folder, ChevronsLeftRight } from 'lucide-react';
 import './App.css';
 
 // Component imports
@@ -604,6 +604,9 @@ function App() {
             title="Drag to resize sidebars symmetrically (Double-click to reset)"
           >
             <div className="sidebar-resizer-line" />
+            <div className="sidebar-resizer-pill">
+              <ChevronsLeftRight size={12} />
+            </div>
           </div>
           <div
             className={`sidebar-resizer resizer-right ${isResizing === 'right' ? 'is-dragging' : ''}`}
@@ -619,6 +622,9 @@ function App() {
             title="Drag to resize sidebars symmetrically (Double-click to reset)"
           >
             <div className="sidebar-resizer-line" />
+            <div className="sidebar-resizer-pill">
+              <ChevronsLeftRight size={12} />
+            </div>
           </div>
         </>
       )}

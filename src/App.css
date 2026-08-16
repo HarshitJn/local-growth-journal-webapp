@@ -91,22 +91,43 @@
 }
 
 .sidebar-resizer-line {
-  width: 4px;
-  height: 56px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
   background-color: var(--accent);
-  border-radius: 4px;
-  opacity: 0.35;
-  transition: opacity 0.2s ease, height 0.2s ease, background-color 0.2s ease, width 0.2s ease;
+  opacity: 0.15;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  pointer-events: none;
+}
+
+.sidebar-resizer-pill {
+  width: 20px;
+  height: 38px;
+  background: var(--card-bg);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  opacity: 0.45;
+  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 2;
   pointer-events: none;
 }
 
 .sidebar-resizer:hover .sidebar-resizer-line,
 .sidebar-resizer.is-dragging .sidebar-resizer-line {
+  opacity: 0.5;
+}
+
+.sidebar-resizer:hover .sidebar-resizer-pill,
+.sidebar-resizer.is-dragging .sidebar-resizer-pill {
   opacity: 1;
-  width: 6px;
-  height: 90px;
-  background-color: var(--accent);
-  box-shadow: 0 0 10px rgba(76, 124, 89, 0.6);
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(76, 124, 89, 0.5);
 }
 
 @media (max-width: 1100px) {
