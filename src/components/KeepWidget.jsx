@@ -12,7 +12,8 @@ export default function KeepWidget({
   onToggleItem,
   onDeleteItem,
   onEditItem,
-  placeholder = "Add new item..."
+  placeholder = "Add new item...",
+  onDeleteWidget
 }) {
   const [inputText, setInputText] = useState('');
   const [editingId, setEditingId] = useState(null);
@@ -47,9 +48,35 @@ export default function KeepWidget({
 
   return (
     <div className="widget-card keep-card">
-      <div className="widget-header">
-        <div className="widget-icon">{icon}</div>
-        <h3 className="widget-title">{title}</h3>
+      <div className="widget-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="widget-icon">{icon}</div>
+          <h3 className="widget-title">{title}</h3>
+        </div>
+        {onDeleteWidget && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteWidget();
+            }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '4px',
+              borderRadius: '4px',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#d9383a'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            title="Delete this widget"
+          >
+            <Trash2 size={14} />
+          </button>
+        )}
       </div>
 
       <div className="widget-body" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>

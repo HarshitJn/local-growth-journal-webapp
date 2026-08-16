@@ -10,25 +10,33 @@ import { cleanAndParseJson } from './jsonParser';
  * @param {string} modelName - The model to use
  * @returns {Promise<Object>} Object with problems, learnings, strengths, quotes
  */
-export async function analyzeJournal(logs, provider, apiKey, modelName, goals = [], todos = []) {
+export async function analyzeJournal(logs, provider, apiKey, modelName, goals = [], todos = [], customWidgets = [], runningSummary = "") {
   if (!apiKey) {
     throw new Error(`Please configure your API Key for ${provider.toUpperCase()} in settings.`);
   }
 
   if (!logs || logs.length === 0) {
-    return { problems: [], learnings: [], strengths: [], quotes: [] };
+    return { problems: [], learnings: [], strengths: [], quotes: [], runningSummary: "" };
   }
 
-  const recentLogs = logs.slice(-30);
+  // Optimize token usage: if runningSummary exists, we only send the latest log.
+  // Otherwise, we send the last 15 logs to bootstrap the summary.
+  const recentLogs = runningSummary ? logs.slice(-1) : logs.slice(-15);
   const logContent = recentLogs.map((log, index) => 
-    `[Log #${index + 1} - ${new Date(log.timestamp).toLocaleDateString()}]\n${log.text}`
+    `[New Log #${index + 1} - ${new Date(log.timestamp).toLocaleDateString()}]\n${log.text}`
   ).join('\n\n');
 
   const activeGoalsStr = goals.filter(g => !g.completed).map(g => `- ${g.text}`).join('\n');
   const activeTodosStr = todos.filter(t => !t.completed).map(t => `- ${t.text}`).join('\n');
 
+  // Format custom widgets
+  const customWidgetsStr = customWidgets.map(widget => {
+    const activeItems = widget.items.filter(item => !item.completed).map(item => `- ${item.text}`).join('\n');
+    return `[Widget: ${widget.title}]\n${activeItems || "No active items."}`;
+  }).join('\n\n');
+
   const systemInstruction = `You are a peaceful, empathetic AI journal companion designed to help the user reflect. 
-Analyze the user's journal logs, active goals, and active todos (ordered from oldest to newest) and extract/update insights.
+Analyze the user's new journal log(s), current mental state summary, active goals, active todos, and other custom widgets, and extract/update insights.
 
 Crucial Rule: Write all bullet points for "problems", "learnings", and "strengths" in the FIRST PERSON (using "I", "my", "me", "myself") from the perspective of the user writing personal notes to themselves. 
 For example:
@@ -41,17 +49,19 @@ Extract:
 2. "learnings": Key learnings, realizations, or takeaways I have discovered (exactly 5 to 12 words per item, maximum of 5 items).
 3. "strengths": Personal strengths, resilience, or virtues I have displayed (exactly 5 to 12 words per item, maximum of 5 items).
 4. "quotes": Memorable one-liner quotes/mantras of exactly 10 to 15 words that synthesize my journey, inspire peace, and serve as easy-to-remember reminders (maximum of 3 items).
+5. "runningSummary": A concise paragraph of exactly 60 to 120 words summarizing my current situation, mental state, recent progress, and ongoing themes. If a previous summary is provided, you MUST update and evolve it by integrating the new journal log context, maintaining it as a continuous running summary.
 
 Response MUST be a valid JSON object matching this schema:
 {
   "problems": ["string"],
   "learnings": ["string"],
   "strengths": ["string"],
-  "quotes": ["string"]
+  "quotes": ["string"],
+  "runningSummary": "string"
 }
 Return ONLY the raw JSON object. Do not add markdown codeblocks, prefix conversational words, or trailing text.`;
 
-  const prompt = `User Journal Logs:
+  const prompt = `${runningSummary ? `Previous Running Summary of User's Journey:\n${runningSummary}\n\n` : ''}New Journal Log(s):
 ${logContent}
 
 Active User Goals:
@@ -60,7 +70,10 @@ ${activeGoalsStr || "None set."}
 Active User Todos:
 ${activeTodosStr || "None set."}
 
-Based on these journal logs and my current active goals/todos, extract problems, learnings, strengths, and quotes in the requested JSON format. Analyze how my logs relate to, reflect progress on, or show blockers concerning these active goals/todos.`;
+Other Active Context Widgets:
+${customWidgetsStr || "None."}
+
+Based on the new journal logs, the previous running summary, and my active goals, todos, and custom widget items, update the list of problems, learnings, strengths, quotes, and generate the updated "runningSummary" in the requested JSON format. Analyze how my logs and widgets relate to, reflect progress on, or show blockers concerning these active goals, todos, and custom widget items.`;
 
   switch (provider) {
     case 'openai':
@@ -237,7 +250,7 @@ export function calculateCost(provider, model, inputTokens, outputTokens) {
   return (inputTokens * rates.input) + (outputTokens * rates.output);
 }
 
-export async function analyzeSingleWidget(logs, widgetKey, provider, apiKey, modelName, goals = [], todos = []) {
+export async function analyzeSingleWidget(logs, widgetKey, provider, apiKey, modelName, goals = [], todos = [], customWidgets = [], runningSummary = "") {
   if (!apiKey) {
     throw new Error(`Please configure your API Key for ${provider.toUpperCase()} in settings.`);
   }
@@ -246,13 +259,21 @@ export async function analyzeSingleWidget(logs, widgetKey, provider, apiKey, mod
     return { items: [], usage: { inputTokens: 0, outputTokens: 0 } };
   }
 
-  const recentLogs = logs.slice(-30);
+  // Optimize token usage: if runningSummary exists, we only send the latest log.
+  // Otherwise, we send the last 15 logs to bootstrap.
+  const recentLogs = runningSummary ? logs.slice(-1) : logs.slice(-15);
   const logContent = recentLogs.map((log, index) => 
-    `[Log #${index + 1} - ${new Date(log.timestamp).toLocaleDateString()}]\n${log.text}`
+    `[New Log #${index + 1} - ${new Date(log.timestamp).toLocaleDateString()}]\n${log.text}`
   ).join('\n\n');
 
   const activeGoalsStr = goals.filter(g => !g.completed).map(g => `- ${g.text}`).join('\n');
   const activeTodosStr = todos.filter(t => !t.completed).map(t => `- ${t.text}`).join('\n');
+
+  // Format custom widgets
+  const customWidgetsStr = customWidgets.map(widget => {
+    const activeItems = widget.items.filter(item => !item.completed).map(item => `- ${item.text}`).join('\n');
+    return `[Widget: ${widget.title}]\n${activeItems || "No active items."}`;
+  }).join('\n\n');
 
   const descriptions = {
     problems: 'Current problems, friction points, or blockers I am currently facing (exactly 5 to 12 words per item, maximum of 5 items). Write in the FIRST PERSON (using "I", "my", "me").',
@@ -262,7 +283,7 @@ export async function analyzeSingleWidget(logs, widgetKey, provider, apiKey, mod
   };
 
   const systemInstruction = `You are a peaceful, empathetic AI journal companion designed to help the user reflect. 
-Analyze the user's journal logs, active goals, and active todos (ordered from oldest to newest) and extract/update insights for the specific section: "${widgetKey}".
+Analyze the user's new journal log(s), current mental state summary, active goals, active todos, and other custom widgets, and extract/update insights for the specific section: "${widgetKey}".
 
 Section description to extract:
 - "${widgetKey}": ${descriptions[widgetKey]}
@@ -273,7 +294,7 @@ Response MUST be a valid JSON object matching this schema:
 }
 Return ONLY the raw JSON object. Do not add markdown codeblocks, prefix conversational words, or trailing text.`;
 
-  const prompt = `User Journal Logs:
+  const prompt = `${runningSummary ? `Previous Running Summary of User's Journey:\n${runningSummary}\n\n` : ''}New Journal Log(s):
 ${logContent}
 
 Active User Goals:
@@ -282,7 +303,10 @@ ${activeGoalsStr || "None set."}
 Active User Todos:
 ${activeTodosStr || "None set."}
 
-Based on these journal logs and my current active goals/todos, extract only the list for "${widgetKey}" in the requested JSON format. Analyze how my logs relate to, reflect progress on, or show blockers concerning these active goals/todos.`;
+Other Active Context Widgets:
+${customWidgetsStr || "None."}
+
+Based on the new journal logs, the previous running summary, and my active goals, todos, and custom widget items, extract only the list for "${widgetKey}" in the requested JSON format. Analyze how my logs and widgets relate to, reflect progress on, or show blockers concerning these active goals, todos, and custom widget items.`;
 
   let response;
   switch (provider) {

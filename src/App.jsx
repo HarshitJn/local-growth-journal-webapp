@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw, CheckCircle, Info, Sparkles, Target, ListTodo } from 'lucide-react';
+import { AlertCircle, Lightbulb, Shield, Quote, BookOpen, Key, Eraser, RefreshCw, CheckCircle, Info, Sparkles, Target, ListTodo, Plus, Folder } from 'lucide-react';
 import './App.css';
 
 // Component imports
@@ -28,6 +28,9 @@ function App() {
   });
   const [goals, setGoals] = useState([]);
   const [todos, setTodos] = useState([]);
+  const [customWidgets, setCustomWidgets] = useState([]);
+  const [runningSummary, setRunningSummary] = useState('');
+  const [isAddingWidget, setIsAddingWidget] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [widgetLoading, setWidgetLoading] = useState({
     problems: false,
@@ -72,6 +75,8 @@ function App() {
     });
     setGoals(data.goals || []);
     setTodos(data.todos || []);
+    setCustomWidgets(data.customWidgets || []);
+    setRunningSummary(data.runningSummary || '');
   }, []);
 
   const handleSendLog = async (text) => {
@@ -86,7 +91,7 @@ function App() {
     };
     const updatedLogs = [...logs, newLog];
     setLogs(updatedLogs);
-    saveJournalData({ logs: updatedLogs, widgets, goals, todos });
+    saveJournalData({ logs: updatedLogs, widgets, goals, todos, customWidgets, runningSummary });
     setErrorMsg('');
 
     // Check if the entry is trivial (less than 3 words or standard greeting noise)
@@ -109,14 +114,23 @@ function App() {
     // 3. Call LLM to update insights
     setIsLoading(true);
     try {
-      const { insights, usage } = await analyzeJournal(updatedLogs, provider, apiKey, modelName, goals, todos);
+      const { insights, usage } = await analyzeJournal(updatedLogs, provider, apiKey, modelName, goals, todos, customWidgets, runningSummary);
       
+      const newWidgets = {
+        problems: insights.problems || [],
+        learnings: insights.learnings || [],
+        strengths: insights.strengths || [],
+        quotes: insights.quotes || []
+      };
+
       // Determine if there is any difference between the old and new insights
-      const hasChanged = JSON.stringify(insights) !== JSON.stringify(widgets);
+      const hasChanged = JSON.stringify(newWidgets) !== JSON.stringify(widgets);
       
       // Update widgets state and persist
-      setWidgets(insights);
-      saveJournalData({ logs: updatedLogs, widgets: insights, goals, todos });
+      setWidgets(newWidgets);
+      const newSummary = insights.runningSummary || runningSummary;
+      setRunningSummary(newSummary);
+      saveJournalData({ logs: updatedLogs, widgets: newWidgets, goals, todos, customWidgets, runningSummary: newSummary });
 
       // Record token usage and cost
       let totalTokens = 0;
@@ -153,19 +167,31 @@ function App() {
     if (updatedLogs.length === 0) {
       const emptyWidgets = { problems: [], learnings: [], strengths: [], quotes: [] };
       setWidgets(emptyWidgets);
-      saveJournalData({ logs: [], widgets: emptyWidgets, goals, todos });
+      setRunningSummary('');
+      saveJournalData({ logs: [], widgets: emptyWidgets, goals, todos, customWidgets, runningSummary: '' });
       return;
     }
 
-    saveJournalData({ logs: updatedLogs, widgets, goals, todos });
+    // Clear running summary on deletion to force a clean re-synchronization
+    saveJournalData({ logs: updatedLogs, widgets, goals, todos, customWidgets, runningSummary: '' });
+    setRunningSummary('');
 
     // Re-analyze remaining logs to keep insights synchronized, if key is available
     if (apiKey) {
       setIsLoading(true);
       try {
-        const { insights, usage } = await analyzeJournal(updatedLogs, provider, apiKey, modelName, goals, todos);
-        setWidgets(insights);
-        saveJournalData({ logs: updatedLogs, widgets: insights, goals, todos });
+        const { insights, usage } = await analyzeJournal(updatedLogs, provider, apiKey, modelName, goals, todos, customWidgets, '');
+        
+        const newWidgets = {
+          problems: insights.problems || [],
+          learnings: insights.learnings || [],
+          strengths: insights.strengths || [],
+          quotes: insights.quotes || []
+        };
+        setWidgets(newWidgets);
+        const newSummary = insights.runningSummary || '';
+        setRunningSummary(newSummary);
+        saveJournalData({ logs: updatedLogs, widgets: newWidgets, goals, todos, customWidgets, runningSummary: newSummary });
 
         // Record token usage and cost
         if (usage && (usage.inputTokens > 0 || usage.outputTokens > 0)) {
@@ -199,12 +225,12 @@ function App() {
   };
 
   const handleClearAllData = () => {
-    if (logs.length === 0 && goals.length === 0 && todos.length === 0) {
+    if (logs.length === 0 && goals.length === 0 && todos.length === 0 && customWidgets.length === 0) {
       alert("Your journal is already empty.");
       return;
     }
     const confirmation = window.prompt(
-      "This will permanently erase ALL journal entries, goals, todos, and AI insights.\n" +
+      "This will permanently erase ALL journal entries, goals, todos, custom widgets, and AI insights.\n" +
       "To confirm this destructive action, please type 'erase' below:"
     );
     if (confirmation === 'erase') {
@@ -213,8 +239,10 @@ function App() {
       setWidgets(emptyWidgets);
       setGoals([]);
       setTodos([]);
-      saveJournalData({ logs: [], widgets: emptyWidgets, goals: [], todos: [] });
-      alert("All journal data, goals, todos, and insights have been erased.");
+      setCustomWidgets([]);
+      setRunningSummary('');
+      saveJournalData({ logs: [], widgets: emptyWidgets, goals: [], todos: [], customWidgets: [], runningSummary: '' });
+      alert("All journal data, goals, todos, custom widgets, and insights have been erased.");
     } else if (confirmation !== null) {
       alert("Wipe cancelled. Confirmation text did not match.");
     }
@@ -247,11 +275,11 @@ function App() {
     setWidgetLoading((prev) => ({ ...prev, [key]: true }));
     setErrorMsg('');
     try {
-      const { items, usage } = await analyzeSingleWidget(logs, key, provider, apiKey, modelName, goals, todos);
+      const { items, usage } = await analyzeSingleWidget(logs, key, provider, apiKey, modelName, goals, todos, customWidgets, runningSummary);
       
       const updatedWidgets = { ...widgets, [key]: items };
       setWidgets(updatedWidgets);
-      saveJournalData({ logs, widgets: updatedWidgets, goals, todos });
+      saveJournalData({ logs, widgets: updatedWidgets, goals, todos, customWidgets, runningSummary });
 
       if (usage && (usage.inputTokens > 0 || usage.outputTokens > 0)) {
         const cost = calculateCost(provider, modelName, usage.inputTokens, usage.outputTokens);
@@ -284,9 +312,18 @@ function App() {
     setIsLoading(true);
     setErrorMsg('');
     try {
-      const { insights, usage } = await analyzeJournal(logs, provider, apiKey, modelName, goals, todos);
-      setWidgets(insights);
-      saveJournalData({ logs, widgets: insights, goals, todos });
+      const { insights, usage } = await analyzeJournal(logs, provider, apiKey, modelName, goals, todos, customWidgets, '');
+      
+      const newWidgets = {
+        problems: insights.problems || [],
+        learnings: insights.learnings || [],
+        strengths: insights.strengths || [],
+        quotes: insights.quotes || []
+      };
+      setWidgets(newWidgets);
+      const newSummary = insights.runningSummary || '';
+      setRunningSummary(newSummary);
+      saveJournalData({ logs, widgets: newWidgets, goals, todos, customWidgets, runningSummary: newSummary });
 
       if (usage && (usage.inputTokens > 0 || usage.outputTokens > 0)) {
         const cost = calculateCost(provider, modelName, usage.inputTokens, usage.outputTokens);
@@ -312,25 +349,25 @@ function App() {
     const newGoal = { id: Date.now().toString(), text, completed: false };
     const updated = [...goals, newGoal];
     setGoals(updated);
-    saveJournalData({ logs, widgets, goals: updated, todos });
+    saveJournalData({ logs, widgets, goals: updated, todos, customWidgets, runningSummary });
   };
 
   const handleToggleGoal = (id) => {
     const updated = goals.map(g => g.id === id ? { ...g, completed: !g.completed } : g);
     setGoals(updated);
-    saveJournalData({ logs, widgets, goals: updated, todos });
+    saveJournalData({ logs, widgets, goals: updated, todos, customWidgets, runningSummary });
   };
 
   const handleDeleteGoal = (id) => {
     const updated = goals.filter(g => g.id !== id);
     setGoals(updated);
-    saveJournalData({ logs, widgets, goals: updated, todos });
+    saveJournalData({ logs, widgets, goals: updated, todos, customWidgets, runningSummary });
   };
 
   const handleEditGoal = (id, newText) => {
     const updated = goals.map(g => g.id === id ? { ...g, text: newText } : g);
     setGoals(updated);
-    saveJournalData({ logs, widgets, goals: updated, todos });
+    saveJournalData({ logs, widgets, goals: updated, todos, customWidgets, runningSummary });
   };
 
   // Todos Handlers
@@ -338,25 +375,97 @@ function App() {
     const newTodo = { id: Date.now().toString(), text, completed: false };
     const updated = [...todos, newTodo];
     setTodos(updated);
-    saveJournalData({ logs, widgets, goals, todos: updated });
+    saveJournalData({ logs, widgets, goals, todos: updated, customWidgets, runningSummary });
   };
 
   const handleToggleTodo = (id) => {
     const updated = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
     setTodos(updated);
-    saveJournalData({ logs, widgets, goals, todos: updated });
+    saveJournalData({ logs, widgets, goals, todos: updated, customWidgets, runningSummary });
   };
 
   const handleDeleteTodo = (id) => {
     const updated = todos.filter(t => t.id !== id);
     setTodos(updated);
-    saveJournalData({ logs, widgets, goals, todos: updated });
+    saveJournalData({ logs, widgets, goals, todos: updated, customWidgets, runningSummary });
   };
 
   const handleEditTodo = (id, newText) => {
     const updated = todos.map(t => t.id === id ? { ...t, text: newText } : t);
     setTodos(updated);
-    saveJournalData({ logs, widgets, goals, todos: updated });
+    saveJournalData({ logs, widgets, goals, todos: updated, customWidgets, runningSummary });
+  };
+
+  // Custom Widgets Handlers
+  const handleAddCustomWidget = (title) => {
+    const newWidget = {
+      id: Date.now().toString(),
+      title: title.trim(),
+      items: []
+    };
+    const updated = [...customWidgets, newWidget];
+    setCustomWidgets(updated);
+    saveJournalData({ logs, widgets, goals, todos, customWidgets: updated, runningSummary });
+  };
+
+  const handleDeleteCustomWidget = (widgetId) => {
+    if (window.confirm("Are you sure you want to delete this custom widget and all its items?")) {
+      const updated = customWidgets.filter(w => w.id !== widgetId);
+      setCustomWidgets(updated);
+      saveJournalData({ logs, widgets, goals, todos, customWidgets: updated, runningSummary });
+    }
+  };
+
+  const handleAddCustomWidgetItem = (widgetId, itemText) => {
+    const updated = customWidgets.map(w => {
+      if (w.id === widgetId) {
+        const newItem = { id: Date.now().toString(), text: itemText, completed: false };
+        return { ...w, items: [...w.items, newItem] };
+      }
+      return w;
+    });
+    setCustomWidgets(updated);
+    saveJournalData({ logs, widgets, goals, todos, customWidgets: updated, runningSummary });
+  };
+
+  const handleToggleCustomWidgetItem = (widgetId, itemId) => {
+    const updated = customWidgets.map(w => {
+      if (w.id === widgetId) {
+        const updatedItems = w.items.map(item => 
+          item.id === itemId ? { ...item, completed: !item.completed } : item
+        );
+        return { ...w, items: updatedItems };
+      }
+      return w;
+    });
+    setCustomWidgets(updated);
+    saveJournalData({ logs, widgets, goals, todos, customWidgets: updated, runningSummary });
+  };
+
+  const handleDeleteCustomWidgetItem = (widgetId, itemId) => {
+    const updated = customWidgets.map(w => {
+      if (w.id === widgetId) {
+        const updatedItems = w.items.filter(item => item.id !== itemId);
+        return { ...w, items: updatedItems };
+      }
+      return w;
+    });
+    setCustomWidgets(updated);
+    saveJournalData({ logs, widgets, goals, todos, customWidgets: updated, runningSummary });
+  };
+
+  const handleEditCustomWidgetItem = (widgetId, itemId, newText) => {
+    const updated = customWidgets.map(w => {
+      if (w.id === widgetId) {
+        const updatedItems = w.items.map(item => 
+          item.id === itemId ? { ...item, text: newText } : item
+        );
+        return { ...w, items: updatedItems };
+      }
+      return w;
+    });
+    setCustomWidgets(updated);
+    saveJournalData({ logs, widgets, goals, todos, customWidgets: updated, runningSummary });
   };
 
   return (
@@ -463,6 +572,131 @@ function App() {
           onEditItem={handleEditTodo}
           placeholder="Add a todo..."
         />
+
+        {/* Custom Widgets */}
+        {customWidgets.map((widget) => (
+          <KeepWidget
+            key={widget.id}
+            title={widget.title}
+            icon={<Folder size={18} />}
+            items={widget.items}
+            onAddItem={(text) => handleAddCustomWidgetItem(widget.id, text)}
+            onToggleItem={(itemId) => handleToggleCustomWidgetItem(widget.id, itemId)}
+            onDeleteItem={(itemId) => handleDeleteCustomWidgetItem(widget.id, itemId)}
+            onEditItem={(itemId, text) => handleEditCustomWidgetItem(widget.id, itemId, text)}
+            placeholder="Add item..."
+            onDeleteWidget={() => handleDeleteCustomWidget(widget.id)}
+          />
+        ))}
+
+        {/* Add Custom Widget Button / Form */}
+        {!isAddingWidget ? (
+          <button
+            onClick={() => setIsAddingWidget(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '16px',
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1.5px dashed var(--card-border)',
+              borderRadius: '16px',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              width: '100%',
+              transition: 'all 0.3s ease',
+              fontSize: '0.9rem',
+              fontWeight: '500',
+              marginTop: '4px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+              e.currentTarget.style.backgroundColor = 'rgba(76, 124, 89, 0.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--card-border)';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+            }}
+          >
+            <Plus size={18} />
+            <span>Add Custom Widget</span>
+          </button>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const fd = new FormData(e.currentTarget);
+              const title = fd.get('widgetTitle');
+              if (title && title.trim()) {
+                handleAddCustomWidget(title.trim());
+                setIsAddingWidget(false);
+              }
+            }}
+            style={{
+              background: 'var(--card-bg)',
+              border: '1px solid var(--card-border)',
+              borderRadius: '16px',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              animation: 'fadeIn 0.2s ease-out',
+              marginTop: '4px'
+            }}
+          >
+            <h4 style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>New Custom Widget</h4>
+            <input
+              name="widgetTitle"
+              type="text"
+              placeholder="e.g. Projects, Shopping List..."
+              autoFocus
+              required
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid var(--card-border)',
+                borderRadius: '8px',
+                padding: '8px 12px',
+                color: 'var(--text-primary)',
+                fontSize: '0.9rem',
+                outline: 'none'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => setIsAddingWidget(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  padding: '4px 8px'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                style={{
+                  background: 'var(--accent)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  padding: '4px 12px'
+                }}
+              >
+                Create
+              </button>
+            </div>
+          </form>
+        )}
       </aside>
 
       {/* Bottom Floating Utilities */}
